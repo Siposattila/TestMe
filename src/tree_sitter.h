@@ -5,7 +5,7 @@
 #include <string_view>
 
 #include <tree_sitter/api.h>
-//#include <tree_sitter/parser.h>
+// #include <tree_sitter/parser.h>
 
 // Including the API directly already pollutes the namespace, but the
 // functions are prefixed. Anything else that we include should be scoped
@@ -18,29 +18,22 @@ namespace ts {
 // These can be ignored while tring to understand the core APIs on demand.
 /////////////////////////////////////////////////////////////////////////////
 
-
-struct FreeHelper{
-  template <typename T>
-  void
-  operator()(T* raw_pointer) const {
+struct FreeHelper {
+  template <typename T> void operator()(T *raw_pointer) const {
     std::free(raw_pointer);
   }
 };
 
-
 // An inclusive range representation
-template<typename T>
-struct Extent {
+template <typename T> struct Extent {
   T start;
   T end;
 };
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Aliases.
 // Create slightly stricter aliases for some of the core tree-sitter types.
 /////////////////////////////////////////////////////////////////////////////
-
 
 // Direct alias of { row: uint32_t; column: uint32_t }
 using Point = TSPoint;
@@ -51,7 +44,6 @@ using Version = uint32_t;
 
 using NodeID = uintptr_t;
 
-
 // For types that manage resources, create custom wrappers that ensure
 // clean-up. For types that can benefit from additional API discovery,
 // wrappers with implicit conversion allow for automated method discovery.
@@ -61,71 +53,44 @@ struct Language {
   // improves the ergonomics a bit, as clients will still make use of the
   // custom language functions.
 
-  /* implicit */ Language(TSLanguage const* language)
-    : impl{language}
-      { }
+  /* implicit */ Language(TSLanguage const *language) : impl{language} {}
 
-  [[nodiscard]] size_t
-  getNumSymbols() const {
+  [[nodiscard]] size_t getNumSymbols() const {
     return ts_language_symbol_count(impl);
   }
 
-  [[nodiscard]] std::string_view
-  getSymbolName(Symbol symbol) const {
+  [[nodiscard]] std::string_view getSymbolName(Symbol symbol) const {
     return ts_language_symbol_name(impl, symbol);
   }
 
-  [[nodiscard]] Symbol
-  getSymbolForName(std::string_view name, bool isNamed) const {
-    return ts_language_symbol_for_name(impl,
-                                       &name.front(),
-                                       static_cast<uint32_t>(name.size()),
-                                       isNamed);
+  [[nodiscard]] Symbol getSymbolForName(std::string_view name,
+                                        bool isNamed) const {
+    return ts_language_symbol_for_name(
+        impl, &name.front(), static_cast<uint32_t>(name.size()), isNamed);
   }
 
-  [[nodiscard]] Version
-  getVersion() const {
-    return ts_language_version(impl);
-  }
+  [[nodiscard]] Version getVersion() const { return ts_language_version(impl); }
 
-  TSLanguage const* impl;
+  TSLanguage const *impl;
 };
-
 
 class Cursor;
 
 struct Node {
-  explicit Node(TSNode node)
-    : impl{node}
-      { }
+  explicit Node(TSNode node) : impl{node} {}
 
   ////////////////////////////////////////////////////////////////
   // Flag checks on nodes
   ////////////////////////////////////////////////////////////////
-  [[nodiscard]] bool
-  isNull() const {
-    return ts_node_is_null(impl);
-  }
+  [[nodiscard]] bool isNull() const { return ts_node_is_null(impl); }
 
-  [[nodiscard]] bool
-  isNamed() const {
-    return ts_node_is_named(impl);
-  }
+  [[nodiscard]] bool isNamed() const { return ts_node_is_named(impl); }
 
-  [[nodiscard]] bool
-  isMissing() const {
-    return ts_node_is_missing(impl);
-  }
+  [[nodiscard]] bool isMissing() const { return ts_node_is_missing(impl); }
 
-  [[nodiscard]] bool
-  isExtra() const {
-    return ts_node_is_extra(impl);
-  }
+  [[nodiscard]] bool isExtra() const { return ts_node_is_extra(impl); }
 
-  [[nodiscard]] bool
-  hasError() const {
-    return ts_node_has_error(impl);
-  }
+  [[nodiscard]] bool hasError() const { return ts_node_has_error(impl); }
 
   // TODO: Not yet available in last release
   // [[nodiscard]] bool
@@ -139,40 +104,31 @@ struct Node {
 
   // Direct parent/sibling/child connections and cursors
 
-  [[nodiscard]] Node
-  getParent() const {
-    return Node{ts_node_parent(impl)};
-  }
+  [[nodiscard]] Node getParent() const { return Node{ts_node_parent(impl)}; }
 
-  [[nodiscard]] Node
-  getPreviousSibling() const {
+  [[nodiscard]] Node getPreviousSibling() const {
     return Node{ts_node_prev_sibling(impl)};
   }
 
-  [[nodiscard]] Node
-  getNextSibling() const {
+  [[nodiscard]] Node getNextSibling() const {
     return Node{ts_node_next_sibling(impl)};
   }
 
-  [[nodiscard]] uint32_t
-  getNumChildren() const {
+  [[nodiscard]] uint32_t getNumChildren() const {
     return ts_node_child_count(impl);
   }
 
-  [[nodiscard]] Node
-  getChild(uint32_t position) const {
+  [[nodiscard]] Node getChild(uint32_t position) const {
     return Node{ts_node_child(impl, position)};
   }
 
   // Named children
 
-  [[nodiscard]] uint32_t
-  getNumNamedChildren() const {
+  [[nodiscard]] uint32_t getNumNamedChildren() const {
     return ts_node_named_child_count(impl);
   }
 
-  [[nodiscard]] Node
-  getNamedChild(uint32_t position) const {
+  [[nodiscard]] Node getNamedChild(uint32_t position) const {
     return Node{ts_node_named_child(impl, position)};
   }
 
@@ -183,16 +139,13 @@ struct Node {
     return ts_node_field_name_for_child(impl, child_position);
   }
 
-  [[nodiscard]] Node
-  getChildByFieldName(std::string_view name) const {
-    return Node{ts_node_child_by_field_name(impl,
-                                            &name.front(),
-                                            static_cast<uint32_t>(name.size()))};
+  [[nodiscard]] Node getChildByFieldName(std::string_view name) const {
+    return Node{ts_node_child_by_field_name(
+        impl, &name.front(), static_cast<uint32_t>(name.size()))};
   }
 
   // Definition deferred until after the definition of Cursor.
-  [[nodiscard]] Cursor
-  getCursor() const;
+  [[nodiscard]] Cursor getCursor() const;
 
   ////////////////////////////////////////////////////////////////
   // Node attributes
@@ -200,26 +153,18 @@ struct Node {
 
   // Returns a unique identifier for a node in a parse tree.
   // NodeIDs are numeric value types.
-  [[nodiscard]] NodeID
-  getID() const {
+  [[nodiscard]] NodeID getID() const {
     return reinterpret_cast<NodeID>(impl.id);
   }
 
   // Returns an S-Expression representation of the subtree rooted at this node.
-  [[nodiscard]] std::unique_ptr<char, FreeHelper>
-  getSExpr() const {
-    return std::unique_ptr<char,FreeHelper>{ts_node_string(impl)};
+  [[nodiscard]] std::unique_ptr<char, FreeHelper> getSExpr() const {
+    return std::unique_ptr<char, FreeHelper>{ts_node_string(impl)};
   }
 
-  [[nodiscard]] Symbol
-  getSymbol() const {
-    return ts_node_symbol(impl);
-  }
+  [[nodiscard]] Symbol getSymbol() const { return ts_node_symbol(impl); }
 
-  [[nodiscard]] std::string_view
-  getType() const {
-    return ts_node_type(impl);
-  }
+  [[nodiscard]] std::string_view getType() const { return ts_node_type(impl); }
 
   // TODO: Not yet available in last release
   // [[nodiscard]] Language
@@ -227,18 +172,15 @@ struct Node {
   //   return ts_node_language(impl);
   // }
 
-  [[nodiscard]] Extent<uint32_t>
-  getByteRange() const {
+  [[nodiscard]] Extent<uint32_t> getByteRange() const {
     return {ts_node_start_byte(impl), ts_node_end_byte(impl)};
   }
 
-  [[nodiscard]] Extent<Point>
-  getPointRange() const {
+  [[nodiscard]] Extent<Point> getPointRange() const {
     return {ts_node_start_point(impl), ts_node_end_point(impl)};
   }
 
-  [[nodiscard]] std::string_view
-  getSourceRange(std::string_view source) const {
+  [[nodiscard]] std::string_view getSourceRange(std::string_view source) const {
     Extent<uint32_t> extents = this->getByteRange();
     return source.substr(extents.start, extents.end - extents.start);
   }
@@ -246,79 +188,54 @@ struct Node {
   TSNode impl;
 };
 
-
 class Tree {
 public:
-  Tree(TSTree* tree)
-    : impl{tree, ts_tree_delete}
-      { }
+  Tree(TSTree *tree) : impl{tree, ts_tree_delete} {}
 
-  [[nodiscard]] Node
-  getRootNode() const {
+  [[nodiscard]] Node getRootNode() const {
     return Node{ts_tree_root_node(impl.get())};
   }
 
-  [[nodiscard]] Language
-  getLanguage() const {
+  [[nodiscard]] Language getLanguage() const {
     return Language{ts_tree_language(impl.get())};
   }
 
-  [[nodiscard]] bool
-  hasError() const {
-    return getRootNode().hasError();
-  }
+  [[nodiscard]] bool hasError() const { return getRootNode().hasError(); }
 
 private:
   std::unique_ptr<TSTree, decltype(&ts_tree_delete)> impl;
 };
 
-
 class Parser {
 public:
-  Parser(Language language)
-    : impl{ts_parser_new(), ts_parser_delete} {
+  Parser(Language language) : impl{ts_parser_new(), ts_parser_delete} {
     ts_parser_set_language(impl.get(), language.impl);
   }
 
-  [[nodiscard]] Tree
-  parseString(std::string_view buffer) {
-    return ts_parser_parse_string(
-      impl.get(),
-      nullptr,
-      &buffer.front(),
-      static_cast<uint32_t>(buffer.size())
-    );
+  [[nodiscard]] Tree parseString(std::string_view buffer) {
+    return ts_parser_parse_string(impl.get(), nullptr, &buffer.front(),
+                                  static_cast<uint32_t>(buffer.size()));
   }
 
 private:
   std::unique_ptr<TSParser, decltype(&ts_parser_delete)> impl;
 };
 
-
 class Cursor {
 public:
-  Cursor(TSNode node)
-    : impl{ts_tree_cursor_new(node)}
-      { }
+  Cursor(TSNode node) : impl{ts_tree_cursor_new(node)} {}
 
-  Cursor(const TSTreeCursor& cursor)
-    : impl{ts_tree_cursor_copy(&cursor)}
-      { }
+  Cursor(const TSTreeCursor &cursor) : impl{ts_tree_cursor_copy(&cursor)} {}
 
   // By default avoid copies and moves until the ergonomics are clearer.
-  Cursor(const Cursor&) = delete;
-  Cursor(Cursor&&) = delete;
-  Cursor& operator=(const Cursor& other) = delete;
-  Cursor& operator=(Cursor&& other) = delete;
+  Cursor(const Cursor &) = delete;
+  Cursor(Cursor &&) = delete;
+  Cursor &operator=(const Cursor &other) = delete;
+  Cursor &operator=(Cursor &&other) = delete;
 
-  ~Cursor() {
-    ts_tree_cursor_delete(&impl);
-  }
+  ~Cursor() { ts_tree_cursor_delete(&impl); }
 
-  void
-  reset(Node node) {
-    ts_tree_cursor_reset(&impl, node.impl);
-  }
+  void reset(Node node) { ts_tree_cursor_reset(&impl, node.impl); }
 
   // TODO: Not yet available in last release
   // void
@@ -326,25 +243,17 @@ public:
   //   ts_tree_cursor_reset_to(&impl, &cursor.impl);
   // }
 
-  [[nodiscard]] Cursor
-  copy() const {
-    return Cursor(impl);
-  }
+  [[nodiscard]] Cursor copy() const { return Cursor(impl); }
 
-  [[nodiscard]] Node
-  getCurrentNode() const {
+  [[nodiscard]] Node getCurrentNode() const {
     return Node{ts_tree_cursor_current_node(&impl)};
   }
-  
+
   // Navigation
 
-  [[nodiscard]] bool
-  gotoParent() {
-    return ts_tree_cursor_goto_parent(&impl);
-  }
+  [[nodiscard]] bool gotoParent() { return ts_tree_cursor_goto_parent(&impl); }
 
-  [[nodiscard]] bool
-  gotoNextSibling() {
+  [[nodiscard]] bool gotoNextSibling() {
     return ts_tree_cursor_goto_next_sibling(&impl);
   }
 
@@ -354,8 +263,7 @@ public:
   //   return ts_tree_cursor_goto_previous_sibling(&impl);
   // }
 
-  [[nodiscard]] bool
-  gotoFirstChild() {
+  [[nodiscard]] bool gotoFirstChild() {
     return ts_tree_cursor_goto_first_child(&impl);
   }
 
@@ -375,13 +283,10 @@ private:
   TSTreeCursor impl;
 };
 
-// To avoid cyclic dependencies and ODR violations, we define all methods 
+// To avoid cyclic dependencies and ODR violations, we define all methods
 // *using* Cursors inline after the definition of Cursor itself.
-[[nodiscard]] Cursor
-inline Node::getCursor() const {
-  return Cursor{impl};
-}
+[[nodiscard]] Cursor inline Node::getCursor() const { return Cursor{impl}; }
 
-}
+} // namespace ts
 
 #endif

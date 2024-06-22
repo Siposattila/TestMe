@@ -11,20 +11,18 @@ if (gtest_POPULATED)
     enable_testing()
 
     set(UnitTests_SOURCES
-	    test/main.cpp
-        test/test.cpp
-        test/test2.cpp
+        test1
+        test2
     )
 
-    add_executable(UnitTests)
+    foreach (unitTest IN LISTS UnitTests_SOURCES)
+        add_executable(${unitTest} "test/${unitTest}.cpp")
 
-    target_sources(UnitTests PRIVATE ${UnitTests_SOURCES})
-    source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${UnitTests_SOURCES})
+        target_link_libraries(${unitTest}
+            gtest
+            gtest_main
+        )
 
-    target_link_libraries(UnitTests
-        gtest
-        gtest_main
-    )
-
-    add_test(UnitTests UnitTests)
+        add_test(${unitTest} ${unitTest})
+    endforeach()
 endif()
