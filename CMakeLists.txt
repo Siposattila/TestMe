@@ -17,6 +17,8 @@ include(FetchContent)
 include(cmake/tree-sitter.cmake)
 include(cmake/gtest.cmake)
 
+target_link_libraries(TestMe PRIVATE stdc++)
+
 target_compile_features(TestMe PRIVATE
 	cxx_std_17
 )
