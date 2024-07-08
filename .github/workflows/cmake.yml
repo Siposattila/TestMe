@@ -23,13 +23,11 @@ jobs:
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compiler }}
-        CXX_STANDARD: 17
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build
       env:
         CC: ${{ matrix.compiler }}
         CXX: ${{ matrix.compiler }}
-        CXX_STANDARD: 17
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
     - name: Test
       working-directory: ${{github.workspace}}/build
