@@ -10,13 +10,12 @@ env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
 
-strategy:
-  matrix:
-    compiler: [gcc, clang]
-
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler: [gcc, clang]
 
     steps:
     - uses: actions/checkout@v4
