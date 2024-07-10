@@ -18,6 +18,14 @@ This project is using [gtest](https://github.com/google/googletest) v1.14.0.
 
 After the build is complete then you just run ```make test```.
 
+# Pre-commit
+To provide a good quality code for the project it is mandatory to use [pre-commit](https://pre-commit.com).
+
+For further instructions on how to use pre-commit please follow the guide on their site.
+
+If you are using pre-commit you want to make sure that your changes will not fail.
+You can check that by running this command before trying to commit: ```pre-commit```
+
 # Tree-sitter
 This project is using [tree-sitter](https://github.com/tree-sitter/tree-sitter) v0.22.6.
 

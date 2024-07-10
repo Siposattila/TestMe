@@ -13,21 +13,12 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        compiler: [gcc, clang]
 
     steps:
     - uses: actions/checkout@v4
     - name: Configure CMake
-      env:
-        CC: ${{ matrix.compiler }}
-        CXX: ${{ matrix.compiler }}
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
     - name: Build
-      env:
-        CC: ${{ matrix.compiler }}
-        CXX: ${{ matrix.compiler }}
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
     - name: Test
       working-directory: ${{github.workspace}}/build
