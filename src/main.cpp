@@ -1,4 +1,4 @@
-#include "tree_sitter.h"
+#include "tree_sitter/tree_sitter.h"
 #include <iostream>
 #include <string>
 

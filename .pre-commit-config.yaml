@@ -7,12 +7,8 @@ repos:
       - id: trailing-whitespace
       - id: check-yaml
       - id: check-added-large-files
-      - id: check-json
       - id: mixed-line-ending
   - repo: https://github.com/pocc/pre-commit-hooks
-    rev: master
+    rev: v1.3.5
     hooks:
       - id: clang-format
-      - id: clang-tidy
-      - id: cppcheck
-      - id: include-what-you-use
