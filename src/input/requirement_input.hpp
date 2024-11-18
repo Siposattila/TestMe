@@ -2,4 +2,9 @@
 
 #include "input.hpp"
 
-class RequirementInput : public Input {};
+class RequirementInput : public Input {
+public:
+  RequirementInput(std::string filename);
+
+  void processInput() override;
+};
