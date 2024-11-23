@@ -1,15 +1,12 @@
-message(STATUS "Fetching gtest (v1.15.2)")
-FetchContent_Declare(gtest
-	GIT_REPOSITORY "https://github.com/google/googletest"
-	GIT_TAG v1.15.2
+CPMAddPackage(
+  NAME googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  VERSION 1.15.2
+  OPTIONS "INSTALL_GTEST OFF" "gtest_force_shared_crt ON"
 )
-FetchContent_MakeAvailable(gtest)
 
-if (gtest_POPULATED)
-    message(STATUS "Fetching gtest (v1.15.2) - done")
-
+if (googletest_ADDED)
     enable_testing()
-
     set(UnitTests
         input_test
     )
@@ -23,6 +20,7 @@ if (gtest_POPULATED)
         target_link_libraries(${unitTest}
             gtest
             gtest_main
+            gmock
         )
         target_compile_features(${unitTest} PRIVATE
         	cxx_std_20
