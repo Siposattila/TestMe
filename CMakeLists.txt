@@ -9,7 +9,7 @@ add_executable(TestMe)
 target_sources(TestMe PRIVATE ${TestMe_SOURCES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${TestMe_SOURCES})
 
-include(FetchContent)
+include(cmake/cpm.cmake)
 include(cmake/tree-sitter.cmake)
 include(cmake/gtest.cmake)
 
