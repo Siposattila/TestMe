@@ -27,6 +27,9 @@ This project is using [gtest](https://github.com/google/googletest) v1.14.0.
 
 After the build is complete then you just run `ctest`.
 
+# How to run
+After following the [how to build section](#how-to-build) you can run it with `./TestMe`.
+
 # Pre-commit
 To provide a good quality code for the project it is mandatory to use [pre-commit](https://pre-commit.com).
 

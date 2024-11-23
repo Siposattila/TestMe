@@ -74,9 +74,11 @@ add_grammar_from_repo(tree-sitter-java
     v0.21.0
 )
 
-target_link_libraries(TestMe PRIVATE
+set(tree-sitter_LIBRARIES
     tree-sitter
     tree-sitter-cpp
     tree-sitter-c-sharp
     tree-sitter-java
 )
+
+target_link_libraries(TestMe PRIVATE ${tree-sitter_LIBRARIES})

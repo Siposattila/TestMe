@@ -1,0 +1,1 @@
+In the Main method there should be variable string message. That should be printed out with Console.WriteLine.
