@@ -4,5 +4,10 @@ class Program {
     string message = "Hello World!!";
     Console.WriteLine(message);
   }
+
+  static void Method() {
+    string message = "Method";
+    Console.WriteLine(message);
+  }
 }
 }

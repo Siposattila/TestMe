@@ -1,6 +1,7 @@
 #pragma once
 
 #include "input.hpp"
+#include <optional>
 #include <string>
 #include <testme_tree_sitter/testme_tree_sitter.h>
 #include <unordered_map>
@@ -16,7 +17,10 @@ public:
   CodeInput(std::string filename);
 
   void processInput() override;
+  const ts::Tree *getTree();
   const std::string getTreeString();
+  const std::optional<ts::Node> findNode(const ts::Node &root,
+                                         std::string name);
 
 private:
   ts::Language mLanguage;
