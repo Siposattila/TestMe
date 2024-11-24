@@ -24,3 +24,12 @@ void Input::readInput() {
   mInput.assign((std::istreambuf_iterator<char>(fileInputStream)),
                 std::istreambuf_iterator<char>());
 }
+
+std::string Input::getExtension() {
+  std::string extension = "";
+  if (mFilename.find_last_of(".") != std::string::npos) {
+    extension = mFilename.substr(mFilename.find_last_of("."));
+  }
+
+  return extension;
+}

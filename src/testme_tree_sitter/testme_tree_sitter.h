@@ -1,5 +1,5 @@
-#ifndef CPP_TREE_SITTER_H
-#define CPP_TREE_SITTER_H
+#ifndef TESTME_TREE_SITTER_H
+#define TESTME_TREE_SITTER_H
 
 #include <iterator>
 #include <memory>

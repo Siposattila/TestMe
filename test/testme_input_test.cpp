@@ -1,10 +1,10 @@
-#include "../src/input/code_input.hpp"
-#include "../src/input/requirement_input.hpp"
 #include <gtest/gtest.h>
 #include <string>
+#include <testme_input/code_input.hpp>
+#include <testme_input/requirement_input.hpp>
 
 TEST(INPUT_TEST, TestCodeInputRead) {
-  CodeInput codeInput("./data/input/code.txt");
+  CodeInput codeInput("./data/input/code.cs");
   codeInput.processInput();
 
   ASSERT_STREQ("namespace CSharpTutorials;\n", codeInput.getInput().c_str());
