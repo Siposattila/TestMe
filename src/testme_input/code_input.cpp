@@ -3,6 +3,7 @@
 #include "input.hpp"
 #include <optional>
 #include <testme_tree_sitter/testme_tree_sitter.h>
+#include <vector>
 
 CodeInput::CodeInput(std::string filename)
     : Input(filename), mSupportedLanguages(), mLanguage(nullptr),
@@ -27,10 +28,16 @@ TSLanguage *CodeInput::getSupportedLanguage() {
   return mSupportedLanguages.find(extension)->second;
 }
 
-const ts::Tree *CodeInput::getTree() { return &mTree; }
-
-const std::string CodeInput::getTreeString() {
+const std::string CodeInput::getParsedCode() {
   return std::string(mTree.getRootNode().getSExpr().get());
+}
+
+const std::string CodeInput::getParsedCodeByNode(ts::Node node) {
+  return std::string(node.getSExpr().get());
+}
+
+const std::string CodeInput::getCodeByNode(ts::Node node) {
+  return std::string(node.getSourceRange(getInput()));
 }
 
 void CodeInput::setLanguage() { mLanguage = getSupportedLanguage(); }
@@ -40,24 +47,55 @@ void CodeInput::parse() {
   mTree = mParser.parseString(getInput());
 }
 
-const std::optional<ts::Node> CodeInput::findNode(const ts::Node &root,
+const std::optional<ts::Node> CodeInput::findNode(const ts::Node &node,
+                                                  std::string_view source,
+                                                  std::string type,
                                                   std::string name) {
-  for (const auto &child : ts::Children{root}) {
-    // Check if the node type is "class"
-    if (child.getType() == "class") {
-      // Retrieve the name of the class (assuming it's a named field or a direct
-      // child)
-      ts::Node nameNode = child.getChildByFieldName("name");
-      // if (!nameNode.isNull() && nameNode.) {
-      //   return child; // Found the node
-      // }
-    }
-
-    // Recursively search in the child nodes
-    if (auto result = findNode(child, name)) {
-      return result;
-    }
+  ts::Cursor cursor = node.getCursor();
+  if (!cursor.gotoFirstChild()) {
+    return std::nullopt;
   }
 
-  return std::nullopt;
+  std::optional<ts::Node> resultNode = std::nullopt;
+  do {
+    ts::Node child = cursor.getCurrentNode();
+    if (child.getType() == type && child.getSourceRange(source) == name) {
+      resultNode = child;
+    } else {
+      resultNode = findNode(child, source, type, name);
+    }
+  } while (cursor.gotoNextSibling() && resultNode == std::nullopt);
+
+  return resultNode;
+}
+
+void CodeInput::findNodes(const ts::Node &node,
+                          std::vector<ts::Node> *resultNodes,
+                          std::string_view source, std::string type,
+                          std::string name) {
+  ts::Cursor cursor = node.getCursor();
+  if (!cursor.gotoFirstChild()) {
+    return;
+  }
+
+  do {
+    ts::Node child = cursor.getCurrentNode();
+    if (child.getType() == type && child.getSourceRange(source) == name) {
+      resultNodes->push_back(child);
+    }
+
+    findNodes(child, resultNodes, source, type, name);
+  } while (cursor.gotoNextSibling());
+}
+
+const std::vector<ts::Node> CodeInput::findNodesByName(std::string name) {
+  std::vector<ts::Node> nodes;
+  findNodes(mTree.getRootNode(), &nodes, getInput(), "identifier", name);
+
+  return nodes;
+}
+
+const ts::Node CodeInput::findFirstNodeByName(std::string name) {
+  return findNode(mTree.getRootNode(), getInput(), "identifier", name)
+      .value_or(ts::Node{TSNode()});
 }

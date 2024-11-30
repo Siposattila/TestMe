@@ -9,5 +9,9 @@ class Program {
     string message = "Method";
     Console.WriteLine(message);
   }
+
+  static void Method(string message) { Console.WriteLine(message); }
+
+  static void JustMethod() { string method = "method"; }
 }
 }
