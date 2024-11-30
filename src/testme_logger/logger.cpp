@@ -1,25 +1,39 @@
 #include "logger.hpp"
 
-Logger::Logger() : mOutputStream(&std::cout) {}
+std::unique_ptr<Logger> Logger::mInstance = nullptr;
+
+Logger::Logger(const std::string &filename) {
+  mOfFile.open(filename, std::ios::app);
+  if (!mOfFile) {
+    throw std::ios_base::failure("Failed to open log file");
+  }
+}
+
+Logger::~Logger() {
+  if (mOfFile.is_open()) {
+    mOfFile.close();
+  }
+}
+
+Logger &Logger::getLogger(const std::string &filePath) {
+  if (!mInstance) {
+    mInstance = std::unique_ptr<Logger>(new Logger(filePath));
+  }
+  return *mInstance;
+}
 
 void Logger::setOutputFile(const std::string &filePath) {
-  if (mFileStream.is_open()) {
-    mFileStream.close();
+  if (mOfFile.is_open()) {
+    mOfFile.close();
   }
 
-  mFileStream.open(filePath, std::ios::out | std::ios::app);
-  if (mFileStream.is_open()) {
-    mOutputStream = &mFileStream;
-  } else {
-    mOutputStream = &std::cout;
+  mOfFile.open(filePath, std::ios::app);
+  if (!mOfFile) {
+    throw std::ios_base::failure("Failed to open new log file");
   }
 }
 
-void Logger::log(LogType logType, const std::string &message) {
-  *mOutputStream << parseLogType(logType) << message << std::endl;
-}
-
-std::string Logger::parseLogType(LogType logType) {
+std::string Logger::parseLogType(LogType logType) const {
   switch (logType) {
   case LogType::INFO:
     return "[INFO]";
@@ -32,7 +46,48 @@ std::string Logger::parseLogType(LogType logType) {
   }
 }
 
-// for testing
-void Logger::setOutputStream(std::ostream &outputStream) {
-  mOutputStream = &outputStream;
+template <typename T> void Logger::log(LogType type, const T &message) {
+  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
+
+  logToConsole(type, logMessage);
+  logToFile(type, logMessage);
+}
+
+template <> void Logger::log<float>(LogType type, const float &message) {
+  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
+
+  logToConsole(type, logMessage);
+  logToFile(type, logMessage);
+}
+
+template <> void Logger::log<double>(LogType type, const double &message) {
+  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
+
+  logToConsole(type, logMessage);
+  logToFile(type, logMessage);
+}
+
+template <>
+void Logger::log<std::string>(LogType type, const std::string &message) {
+  std::string logMessage = parseLogType(type) + " " + message;
+
+  logToConsole(type, logMessage);
+  logToFile(type, logMessage);
+}
+
+template <> void Logger::log<int>(LogType type, const int &message) {
+  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
+
+  logToConsole(type, logMessage);
+  logToFile(type, logMessage);
+}
+
+void Logger::logToConsole(LogType type, const std::string &message) {
+  std::cout << message << std::endl;
+}
+
+void Logger::logToFile(LogType type, const std::string &message) {
+  if (mOfFile.is_open()) {
+    mOfFile << message << std::endl;
+  }
 }
