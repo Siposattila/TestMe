@@ -28,6 +28,8 @@ TSLanguage *CodeInput::getSupportedLanguage() {
   return mSupportedLanguages.find(extension)->second;
 }
 
+const Language CodeInput::getLanguage() { return mTree.getLanguage(); }
+
 const std::string CodeInput::getParsedCode() {
   return std::string(mTree.getRootNode().getSExpr().get());
 }

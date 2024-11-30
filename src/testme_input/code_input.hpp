@@ -21,6 +21,8 @@ public:
 
   void processInput() override;
 
+  const Language getLanguage();
+
   const std::string getParsedCode();
   const std::string getParsedCodeByNode(Node node);
   const std::string getCodeByNode(Node node);
