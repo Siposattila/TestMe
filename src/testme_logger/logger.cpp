@@ -1,36 +1,24 @@
 #include "logger.hpp"
+#include <format>
+#include <fstream>
+#include <iostream>
 
-std::unique_ptr<Logger> Logger::mInstance = nullptr;
+Logger *Logger::mInstance = nullptr;
 
-Logger::Logger(const std::string &filename) {
-  mOfFile.open(filename, std::ios::app);
-  if (!mOfFile) {
-    throw std::ios_base::failure("Failed to open log file");
-  }
-}
+Logger::Logger(const std::string &filename) : mFilename(filename) {}
 
 Logger::~Logger() {
-  if (mOfFile.is_open()) {
-    mOfFile.close();
+  if (mOutputFileStream.is_open()) {
+    mOutputFileStream.close();
   }
 }
 
-Logger &Logger::getLogger(const std::string &filePath) {
-  if (!mInstance) {
-    mInstance = std::unique_ptr<Logger>(new Logger(filePath));
+Logger &Logger::getLogger(const std::string &filename) {
+  if (mInstance != nullptr) {
+    mInstance = new Logger(filename);
   }
+
   return *mInstance;
-}
-
-void Logger::setOutputFile(const std::string &filePath) {
-  if (mOfFile.is_open()) {
-    mOfFile.close();
-  }
-
-  mOfFile.open(filePath, std::ios::app);
-  if (!mOfFile) {
-    throw std::ios_base::failure("Failed to open new log file");
-  }
 }
 
 std::string Logger::parseLogType(LogType logType) const {
@@ -47,47 +35,30 @@ std::string Logger::parseLogType(LogType logType) const {
 }
 
 template <typename T> void Logger::log(LogType type, const T &message) {
-  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
-
-  logToConsole(type, logMessage);
-  logToFile(type, logMessage);
+  std::string logMessage = std::format("{} {}", parseLogType(type), message);
+  writeToConsole(logMessage);
+  // writeToFile(logMessage);
 }
 
-template <> void Logger::log<float>(LogType type, const float &message) {
-  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
-
-  logToConsole(type, logMessage);
-  logToFile(type, logMessage);
-}
-
-template <> void Logger::log<double>(LogType type, const double &message) {
-  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
-
-  logToConsole(type, logMessage);
-  logToFile(type, logMessage);
-}
-
-template <>
-void Logger::log<std::string>(LogType type, const std::string &message) {
-  std::string logMessage = parseLogType(type) + " " + message;
-
-  logToConsole(type, logMessage);
-  logToFile(type, logMessage);
-}
-
-template <> void Logger::log<int>(LogType type, const int &message) {
-  std::string logMessage = parseLogType(type) + " " + std::to_string(message);
-
-  logToConsole(type, logMessage);
-  logToFile(type, logMessage);
-}
-
-void Logger::logToConsole(LogType type, const std::string &message) {
+void Logger::writeToConsole(const std::string &message) {
   std::cout << message << std::endl;
 }
 
-void Logger::logToFile(LogType type, const std::string &message) {
-  if (mOfFile.is_open()) {
-    mOfFile << message << std::endl;
-  }
+// FIXME: segfault static maybe????
+void Logger::writeToFile(const std::string &message) {
+  // if (!mOutputFileStream.is_open()) {
+  std::cout << mFilename << std::endl;
+  // mOutputFileStream.open(mFilename, std::ios::out | std::ios::app);
+  //  if (!mOutputFileStream.is_open()) {
+  //    throw std::ios_base::failure("Failed to open log file.");
+  //  }
+  // }
+  //  mOutputFileStream << message << std::endl;
+  //  mOutputFileStream.flush();
 }
+
+template void Logger::log<int>(LogType type, const int &number);
+template void Logger::log<double>(LogType type, const double &number);
+template void Logger::log<float>(LogType type, const float &number);
+template void Logger::log<std::string>(LogType type,
+                                       const std::string &message);

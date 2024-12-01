@@ -1,40 +1,29 @@
 #pragma once
 
+#include <cstdint>
 #include <fstream>
-#include <iostream>
-#include <memory>
 #include <string>
 
-enum class LogType { INFO, WARNING, ERROR, DEBUG };
+enum class LogType : uint8_t { INFO, WARNING, ERROR, DEBUG };
 
 class Logger {
 public:
+  // No copy constructor!
+  Logger(const Logger &logger) = delete;
+
+  static Logger &getLogger(const std::string &filename = "testme.log");
+  template <typename T> void log(LogType logType, const T &message);
+
+private:
   Logger(const std::string &filename);
   ~Logger();
 
-  Logger(const Logger &) = delete;
-  Logger &operator=(const Logger &) = delete;
+  const std::string &mFilename;
+  std::ofstream mOutputFileStream;
+  static Logger *mInstance;
 
-  static Logger &getLogger(const std::string &filename = "logger.log");
-
-  void setOutputFile(const std::string &filePath);
-
-  template <typename T> void log(LogType logType, const T &message);
-
-  template <> void log<int>(LogType type, const int &message);
-
-  template <> void log<float>(LogType type, const float &message);
-
-  template <> void log<double>(LogType type, const double &message);
-
-  template <> void log<std::string>(LogType type, const std::string &message);
-
-  void logToConsole(LogType type, const std::string &message);
-  void logToFile(LogType type, const std::string &message);
-
-private:
   std::string parseLogType(LogType logType) const;
 
-  std::ofstream mOfFile;
-  static std::unique_ptr<Logger> mInstance;
+  void writeToConsole(const std::string &message);
+  void writeToFile(const std::string &message);
 };
