@@ -9,6 +9,7 @@ public:
 
   std::string getFilename() { return mFilename; }
   std::string getInput() { return mInput; }
+  std::string getExtension();
   virtual void processInput() = 0;
 
 protected:

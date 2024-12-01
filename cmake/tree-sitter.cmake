@@ -7,8 +7,7 @@ CPMAddPackage(
 
 if (tree-sitter_ADDED)
     add_library(tree-sitter)
-    target_sources(tree-sitter
-      PRIVATE
+    target_sources(tree-sitter PRIVATE
         "${tree-sitter_SOURCE_DIR}/lib/src/lib.c"
     )
     target_include_directories(tree-sitter
@@ -18,8 +17,7 @@ if (tree-sitter_ADDED)
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${tree-sitter_SOURCE_DIR}/lib/include>
     )
-    target_compile_options(tree-sitter
-      PRIVATE
+    target_compile_options(tree-sitter PRIVATE
         "$<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-conversion>"
     )
 endif()
@@ -44,10 +42,7 @@ function(add_grammar_from_repo NAME REPO VERSION)
             $<BUILD_INTERFACE:${${NAME}_SOURCE_DIR}/src> PUBLIC
             $<INSTALL_INTERFACE:include>
         )
-
-        target_link_libraries(${NAME} INTERFACE
-            tree-sitter
-        )
+        target_link_libraries(${NAME} INTERFACE tree-sitter)
         target_compile_options(${NAME} PRIVATE
             "$<$<CXX_COMPILER_ID:GNU,Clang,AppleClang>:-Wno-unused-but-set-variable>"
         )
@@ -75,5 +70,3 @@ set(tree-sitter_LIBRARIES
     tree-sitter-c-sharp
     tree-sitter-java
 )
-
-target_link_libraries(TestMe PRIVATE ${tree-sitter_LIBRARIES})
