@@ -23,7 +23,7 @@ After you change something just run `make` in the build folder.
 # How to test
 When you build with `make` then the tests are built as well.
 
-This project is using [gtest](https://github.com/google/googletest) v1.14.0.
+This project is using [gtest](https://github.com/google/googletest) v1.15.2.
 
 After the build is complete then you just run `ctest`.
 
@@ -44,9 +44,9 @@ You can always check with pre-commit that your changes will fail or not before m
 Just run: `pre-commit`
 
 # Tree-sitter
-This project is using [tree-sitter](https://github.com/tree-sitter/tree-sitter) v0.22.6.
+This project is using [tree-sitter](https://github.com/tree-sitter/tree-sitter) v0.24.4.
 
 ## Tree-sitter grammar
-- [tree-sitter-cpp](https://github.com/tree-sitter/tree-sitter-cpp) v0.22.2
-- [tree-sitter-java](https://github.com/tree-sitter/tree-sitter-java) v0.21.2
-- [tree-sitter-c-sharp](https://github.com/tree-sitter/tree-sitter-c-sharp) v0.21.0
+- [tree-sitter-cpp](https://github.com/tree-sitter/tree-sitter-cpp) v0.23.4
+- [tree-sitter-java](https://github.com/tree-sitter/tree-sitter-java) v0.23.4
+- [tree-sitter-c-sharp](https://github.com/tree-sitter/tree-sitter-c-sharp) v0.23.1

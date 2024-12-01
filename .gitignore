@@ -3,3 +3,7 @@ cmake-build*/
 CMakerLists.txt
 CMakeLists.txt.user
 .cache/
+
+## CPM
+cpm-package-lock.cmake
+CPM_modules/
