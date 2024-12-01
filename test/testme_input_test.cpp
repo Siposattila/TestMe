@@ -1,3 +1,4 @@
+#include "testme_input/code_input_unsupported_exception.hpp"
 #include <gtest/gtest.h>
 #include <string>
 #include <testme_input/code_input.hpp>
@@ -80,6 +81,18 @@ TEST(CODE_INPUT_TEST, TestCodeInputGetCodeByNode) {
       codeInput.getCodeByNode(codeInput.findFirstNodeByName("CSharpTutorials"))
           .c_str(),
       "CSharpTutorials");
+}
+
+TEST(CODE_INPUT_TEST, TestCodeInputUnsupportedLanguageException) {
+  CodeInput codeInput("./data/input/requirement.txt");
+  try {
+    codeInput.processInput();
+    FAIL() << "Should throw exception.";
+  } catch (CodeInputUnsupportedException &err) {
+    EXPECT_EQ(err.what(), CodeInputUnsupportedException::ErrorNotSupported);
+  } catch (...) {
+    FAIL() << "Should throw CodeInputUnsupportedException.";
+  }
 }
 
 TEST(REQUIREMENT_INPUT_TEST, TestRequirementRead) {

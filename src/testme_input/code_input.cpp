@@ -22,7 +22,8 @@ void CodeInput::processInput() {
 TSLanguage *CodeInput::getSupportedLanguage() {
   std::string extension = getExtension();
   if (!mSupportedLanguages.contains(extension)) {
-    throw CodeInputUnsupportedException::ErrorNotSupported;
+    throw CodeInputUnsupportedException(
+        CodeInputUnsupportedException::ErrorNotSupported);
   }
 
   return mSupportedLanguages.find(extension)->second;
@@ -49,18 +50,18 @@ void CodeInput::parse() {
   mTree = mParser.parseString(getInput());
 }
 
-const std::optional<ts::Node> CodeInput::findNode(const ts::Node &node,
-                                                  std::string_view source,
-                                                  std::string type,
-                                                  std::string name) {
-  ts::Cursor cursor = node.getCursor();
+const std::optional<Node> CodeInput::findNode(const Node &node,
+                                              std::string_view source,
+                                              std::string type,
+                                              std::string name) {
+  Cursor cursor = node.getCursor();
   if (!cursor.gotoFirstChild()) {
     return std::nullopt;
   }
 
-  std::optional<ts::Node> resultNode = std::nullopt;
+  std::optional<Node> resultNode = std::nullopt;
   do {
-    ts::Node child = cursor.getCurrentNode();
+    Node child = cursor.getCurrentNode();
     if (child.getType() == type && child.getSourceRange(source) == name) {
       resultNode = child;
     } else {
@@ -71,17 +72,16 @@ const std::optional<ts::Node> CodeInput::findNode(const ts::Node &node,
   return resultNode;
 }
 
-void CodeInput::findNodes(const ts::Node &node,
-                          std::vector<ts::Node> *resultNodes,
+void CodeInput::findNodes(const Node &node, std::vector<Node> *resultNodes,
                           std::string_view source, std::string type,
                           std::string name) {
-  ts::Cursor cursor = node.getCursor();
+  Cursor cursor = node.getCursor();
   if (!cursor.gotoFirstChild()) {
     return;
   }
 
   do {
-    ts::Node child = cursor.getCurrentNode();
+    Node child = cursor.getCurrentNode();
     if (child.getType() == type && child.getSourceRange(source) == name) {
       resultNodes->push_back(child);
     }
@@ -90,14 +90,14 @@ void CodeInput::findNodes(const ts::Node &node,
   } while (cursor.gotoNextSibling());
 }
 
-const std::vector<ts::Node> CodeInput::findNodesByName(std::string name) {
-  std::vector<ts::Node> nodes;
+const std::vector<Node> CodeInput::findNodesByName(std::string name) {
+  std::vector<Node> nodes;
   findNodes(mTree.getRootNode(), &nodes, getInput(), "identifier", name);
 
   return nodes;
 }
 
-const ts::Node CodeInput::findFirstNodeByName(std::string name) {
+const Node CodeInput::findFirstNodeByName(std::string name) {
   return findNode(mTree.getRootNode(), getInput(), "identifier", name)
-      .value_or(ts::Node{TSNode()});
+      .value_or(Node{TSNode()});
 }
