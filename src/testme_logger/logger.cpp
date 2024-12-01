@@ -1,21 +1,29 @@
 #include "logger.hpp"
 #include <format>
 #include <fstream>
+#include <ios>
 #include <iostream>
 
+std::ofstream *Logger::mOutputFileStream = nullptr;
 Logger *Logger::mInstance = nullptr;
 
-Logger::Logger(const std::string &filename) : mFilename(filename) {}
-
 Logger::~Logger() {
-  if (mOutputFileStream.is_open()) {
-    mOutputFileStream.close();
+  if (mOutputFileStream->is_open()) {
+    mOutputFileStream->close();
   }
+
+  delete mInstance;
+  delete mOutputFileStream;
 }
 
-Logger &Logger::getLogger(const std::string &filename) {
-  if (mInstance != nullptr) {
-    mInstance = new Logger(filename);
+Logger &Logger::getLogger(std::string filename) {
+  if (mInstance == nullptr) {
+    mInstance = new Logger();
+    mOutputFileStream =
+        new std::ofstream(filename, std::ios::out | std::ios::app);
+    if (!mOutputFileStream->is_open()) {
+      throw std::ios_base::failure("Failed to open log file.");
+    }
   }
 
   return *mInstance;
@@ -37,24 +45,15 @@ std::string Logger::parseLogType(LogType logType) const {
 template <typename T> void Logger::log(LogType type, const T &message) {
   std::string logMessage = std::format("{} {}", parseLogType(type), message);
   writeToConsole(logMessage);
-  // writeToFile(logMessage);
+  writeToFile(logMessage);
 }
 
-void Logger::writeToConsole(const std::string &message) {
+void Logger::writeToConsole(std::string message) {
   std::cout << message << std::endl;
 }
 
-// FIXME: segfault static maybe????
-void Logger::writeToFile(const std::string &message) {
-  // if (!mOutputFileStream.is_open()) {
-  std::cout << mFilename << std::endl;
-  // mOutputFileStream.open(mFilename, std::ios::out | std::ios::app);
-  //  if (!mOutputFileStream.is_open()) {
-  //    throw std::ios_base::failure("Failed to open log file.");
-  //  }
-  // }
-  //  mOutputFileStream << message << std::endl;
-  //  mOutputFileStream.flush();
+void Logger::writeToFile(std::string message) {
+  *mOutputFileStream << message << std::endl;
 }
 
 template void Logger::log<int>(LogType type, const int &number);

@@ -1,68 +1,66 @@
+#include <format>
 #include <gtest/gtest.h>
 #include <string>
 #include <testme_logger/logger.hpp>
 
-std::string getConsoleOutput(std::function<void()> func) {
-  std::ostringstream consoleStream;
-  std::streambuf *originalBuffer = std::cout.rdbuf();
-  std::cout.rdbuf(consoleStream.rdbuf());
+TEST(LOGGER_SERVICE_TEST, TestInfoMessageStringIsCorrectCout) {
+  std::stringstream buffer;
+  std::streambuf *coutBuf = std::cout.rdbuf(buffer.rdbuf());
 
-  func();
+  std::string message = "This is a test";
+  Logger::getLogger().log(LogType::INFO, message);
 
-  std::cout.rdbuf(originalBuffer);
-  return consoleStream.str();
-}
-
-TEST(LOGGER_SERVICE_TEST, TestInfoMessageString) {
-  Logger &logger = Logger::getLogger();
-
-  std::string testMessage = "This is a test";
-  logger.log(LogType::INFO, testMessage);
-
-  std::string expectedMessage = "[INFO] " + testMessage + "\n";
-  std::string actualMessage =
-      getConsoleOutput([&]() { logger.log(LogType::INFO, testMessage); });
+  std::string actualMessage = buffer.str();
+  std::string expectedMessage = "[INFO] " + message + "\n";
 
   ASSERT_EQ(actualMessage, expectedMessage);
+
+  std::cout.rdbuf(coutBuf);
 }
 
-TEST(LOGGER_SERVICE_TEST, TestInfoMessageInt) {
-  Logger &logger = Logger::getLogger();
+TEST(LOGGER_SERVICE_TEST, TestInfoMessageIntIsCorrectCout) {
+  std::stringstream buffer;
+  std::streambuf *coutBuf = std::cout.rdbuf(buffer.rdbuf());
 
-  int testMessage = 911;
-  logger.log(LogType::INFO, testMessage);
+  int message = 911;
+  Logger::getLogger().log(LogType::INFO, message);
 
-  std::string expectedMessage = "[INFO] 911\n";
-  std::string actualMessage =
-      getConsoleOutput([&]() { logger.log(LogType::INFO, testMessage); });
+  std::string actualMessage = buffer.str();
+  std::string expectedMessage = std::format("[INFO] {}\n", message);
 
   ASSERT_EQ(actualMessage, expectedMessage);
+
+  std::cout.rdbuf(coutBuf);
 }
 
-TEST(LOGGER_SERVICE_TEST, TestInfoMessageDouble) {
-  Logger &logger = Logger::getLogger();
+TEST(LOGGER_SERVICE_TEST, TestInfoMessageDoubleIsCorrectCout) {
+  std::stringstream buffer;
+  std::streambuf *coutBuf = std::cout.rdbuf(buffer.rdbuf());
 
-  double testMessage = 911.2;
-  logger.log(LogType::INFO, testMessage);
+  double message = 911.2;
+  Logger::getLogger().log(LogType::INFO, message);
 
-  std::string expectedMessage = "[INFO] 911.200000\n";
-  std::string actualMessage =
-      getConsoleOutput([&]() { logger.log(LogType::INFO, testMessage); });
+  std::string actualMessage = buffer.str();
+  std::string expectedMessage = std::format("[INFO] {}\n", message);
 
   ASSERT_EQ(actualMessage, expectedMessage);
+
+  std::cout.rdbuf(coutBuf);
 }
 
-TEST(LOGGER_SERVICE_TEST, TestInfoMessageFloat) {
-  Logger &logger = Logger::getLogger();
+TEST(LOGGER_SERVICE_TEST, TestInfoMessageFloatIsCorrectCout) {
+  std::stringstream buffer;
+  std::streambuf *coutBuf = std::cout.rdbuf(buffer.rdbuf());
 
-  float testMessage = 2.718f;
-  logger.log(LogType::INFO, testMessage);
+  float message = 2.718f;
+  Logger::getLogger().log(LogType::INFO, message);
 
-  std::string expectedMessage = "[INFO] 2.718000\n";
-  std::string actualMessage =
-      getConsoleOutput([&]() { logger.log(LogType::INFO, testMessage); });
+  std::string actualMessage = buffer.str();
+  std::string expectedMessage = std::format("[INFO] {}\n", message);
 
   ASSERT_EQ(actualMessage, expectedMessage);
+
+  std::cout.rdbuf(coutBuf);
 }
 
 int main() {
