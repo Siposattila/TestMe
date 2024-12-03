@@ -22,6 +22,7 @@ jobs:
         export PATH="/usr/lib/llvm-18/bin:$PATH"
         clang --version
         clang++ --version
+        sudo apt-get install libstdc++-13-dev
 
     - name: Configure CMake
       run: cmake -B ${{ github.workspace }}/build -DCMAKE_C_COMPILER=/usr/lib/llvm-18/bin/clang -DCMAKE_CXX_COMPILER=/usr/lib/llvm-18/bin/clang++ -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
