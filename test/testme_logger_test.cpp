@@ -5,42 +5,6 @@
 #include <string>
 #include <testme_logger/logger.hpp>
 
-TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectFile) {
-  std::string filename = "unittest.log";
-  std::vector<std::string> fileLines;
-
-  std::string message = "This is a test";
-  Logger::getLogger(filename).log(LogType::WARNING, message);
-
-  std::ifstream file(filename);
-  if (!file) {
-    FAIL() << "Failed to open file: " << filename;
-  }
-
-  std::string line;
-  while (std::getline(file, line)) {
-    fileLines.push_back(line);
-  }
-
-  std::string actualMessage = fileLines.front();
-
-  file.close();
-
-  std::string expectedMessage = "[WARNING] " + message;
-
-  ASSERT_EQ(actualMessage, expectedMessage);
-
-  try {
-    if (std::filesystem::remove(filename)) {
-      std::cout << "File deleted successfully.\n";
-    } else {
-      std::cout << "File not found.\n";
-    }
-  } catch (const std::filesystem::filesystem_error &e) {
-    std::cerr << "Error: " << e.what() << '\n';
-  }
-}
-
 TEST(LOGGER_SERVICE_TEST, TestInfoMessageStringIsCorrectCout) {
   std::stringstream buffer;
   std::streambuf *coutBuf = std::cout.rdbuf(buffer.rdbuf());
@@ -144,6 +108,45 @@ TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectCout) {
   ASSERT_EQ(actualMessage, expectedMessage);
 
   std::cout.rdbuf(coutBuf);
+}
+
+TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectFile) {
+  // Make it so we can create a new file
+  // Logger::getLogger().~Logger();
+
+  std::string filename = "unittest.log";
+  std::vector<std::string> fileLines;
+
+  std::string message = "This is a test";
+  Logger::getLogger(filename).log(LogType::WARNING, message);
+
+  std::ifstream file(filename);
+  if (!file.is_open()) {
+    FAIL() << "Failed to open file: " << filename;
+  }
+
+  std::string line;
+  while (std::getline(file, line)) {
+    fileLines.push_back(line);
+  }
+
+  file.close();
+
+  std::string actualMessage = fileLines.front();
+
+  std::string expectedMessage = "[WARNING] " + message;
+
+  ASSERT_EQ(actualMessage, expectedMessage);
+
+  try {
+    if (std::filesystem::remove(filename)) {
+      std::cout << "File deleted successfully.\n";
+    } else {
+      FAIL() << "File not found: " << filename;
+    }
+  } catch (const std::filesystem::filesystem_error &e) {
+    FAIL() << "Error: " << e.what() << '\n';
+  }
 }
 
 int main() {

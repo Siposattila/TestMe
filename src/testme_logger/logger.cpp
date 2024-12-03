@@ -12,8 +12,8 @@ Logger::~Logger() {
     mOutputFileStream->close();
   }
 
-  delete mInstance;
   delete mOutputFileStream;
+  mOutputFileStream = nullptr;
 }
 
 Logger &Logger::getLogger(std::string filename) {
