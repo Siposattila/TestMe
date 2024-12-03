@@ -2,12 +2,15 @@
 
 #include <cstdint>
 #include <fstream>
+#include <memory>
 #include <string>
 
 enum class LogType : uint8_t { INFO, WARNING, ERROR, DEBUG };
 
 class Logger {
 public:
+  ~Logger();
+
   // No copy constructor!
   Logger(const Logger &logger) = delete;
 
@@ -16,10 +19,9 @@ public:
 
 private:
   Logger() = default;
-  ~Logger();
 
-  static std::ofstream *mOutputFileStream;
-  static Logger *mInstance;
+  std::ofstream mOutputFileStream;
+  static std::unique_ptr<Logger> mInstance;
 
   std::string parseLogType(LogType logType) const;
 

@@ -3,25 +3,24 @@
 #include <fstream>
 #include <ios>
 #include <iostream>
+#include <memory>
 
-std::ofstream *Logger::mOutputFileStream = nullptr;
-Logger *Logger::mInstance = nullptr;
+std::unique_ptr<Logger> Logger::mInstance = nullptr;
 
 Logger::~Logger() {
-  if (mOutputFileStream->is_open()) {
-    mOutputFileStream->close();
+  if (mOutputFileStream.is_open()) {
+    mOutputFileStream.close();
   }
 
-  delete mOutputFileStream;
-  mOutputFileStream = nullptr;
+  mInstance = nullptr;
 }
 
 Logger &Logger::getLogger(std::string filename) {
   if (mInstance == nullptr) {
-    mInstance = new Logger();
-    mOutputFileStream =
-        new std::ofstream(filename, std::ios::out | std::ios::app);
-    if (!mOutputFileStream->is_open()) {
+    mInstance.reset(new Logger());
+    mInstance.get()->mOutputFileStream =
+        std::ofstream(filename, std::ios::out | std::ios::app);
+    if (!mInstance.get()->mOutputFileStream.is_open()) {
       throw std::ios_base::failure("Failed to open log file.");
     }
   }
@@ -53,7 +52,7 @@ void Logger::writeToConsole(std::string message) {
 }
 
 void Logger::writeToFile(std::string message) {
-  *mOutputFileStream << message << std::endl;
+  mOutputFileStream << message << std::endl;
 }
 
 template void Logger::log<int>(LogType type, const int &number);

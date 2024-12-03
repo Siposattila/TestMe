@@ -112,7 +112,7 @@ TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectCout) {
 
 TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectFile) {
   // Make it so we can create a new file
-  // Logger::getLogger().~Logger();
+  Logger::getLogger().~Logger();
 
   std::string filename = "unittest.log";
   std::vector<std::string> fileLines;
@@ -129,14 +129,7 @@ TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectFile) {
   while (std::getline(file, line)) {
     fileLines.push_back(line);
   }
-
   file.close();
-
-  std::string actualMessage = fileLines.front();
-
-  std::string expectedMessage = "[WARNING] " + message;
-
-  ASSERT_EQ(actualMessage, expectedMessage);
 
   try {
     if (std::filesystem::remove(filename)) {
@@ -147,6 +140,11 @@ TEST(LOGGER_SERVICE_TEST, TestWarningMessageStringIsCorrectFile) {
   } catch (const std::filesystem::filesystem_error &e) {
     FAIL() << "Error: " << e.what() << '\n';
   }
+
+  std::string actualMessage = fileLines.front();
+  std::string expectedMessage = "[WARNING] " + message;
+
+  ASSERT_EQ(actualMessage, expectedMessage);
 }
 
 int main() {
