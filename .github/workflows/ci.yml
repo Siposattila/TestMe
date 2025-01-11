@@ -66,9 +66,11 @@ jobs:
         sudo apt-get install -y libstdc++-13-dev
 
     - name: Configure CMake
+      working-directory: ${{ github.workspace }}/testme
       run: cmake -B ${{ github.workspace }}/testme/build -DCMAKE_C_COMPILER=/usr/lib/llvm-18/bin/clang -DCMAKE_CXX_COMPILER=/usr/lib/llvm-18/bin/clang++ -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Build
+      working-directory: ${{ github.workspace }}/testme
       run: cmake --build ${{ github.workspace }}/testme/build --config ${{ env.BUILD_TYPE }}
 
     - name: Test
