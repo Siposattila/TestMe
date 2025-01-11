@@ -1,4 +1,4 @@
-name: Build and test
+name: CI
 
 on:
   push:
@@ -8,8 +8,47 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  build-and-test:
+  precommit:
     runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: pre-commit/action@v3
+
+  tmtsl:
+    runs-on: ubuntu-latest
+    needs: precommit
+    defaults:
+      run:
+        working-directory: ./tmtsl
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.22.3
+
+    - name: Install dependencies
+      run: go mod download
+
+    - name: Setup gocc
+      run: sudo apt-get install gocc
+      shell: bash
+
+    - name: Gocc build tmtsl
+      run: gocc tmtsl.bnf
+
+    - name: Build
+      run: go build -v
+
+    - name: Test
+      run: go test -v
+
+  testme:
+    runs-on: ubuntu-latest
+    needs: [precommit, tmtsl]
 
     steps:
     - uses: actions/checkout@v4

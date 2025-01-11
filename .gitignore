@@ -8,3 +8,13 @@ CMakeLists.txt.user
 ## CPM
 cpm-package-lock.cmake
 CPM_modules/
+
+## tmtsl
+tmtsl/errors
+tmtsl/lexer
+tmtsl/parser
+tmtsl/token
+tmtsl/util
+tmtsl/*.txt
+tmtsl/tmtsl
+tmtsl/*.exe

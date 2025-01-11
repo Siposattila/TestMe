@@ -1,0 +1,128 @@
+/* Lexical Parser */
+
+!whitespace : '\t' | '\n' | '\r' | ' ' ;
+!lineComment : '/' '/' { . } '\n' ;
+!blockComment : '/' '*' { . | '*' } '*' '/' ;
+
+_letter : 'A'-'Z' | 'a'-'z' | '_' ;
+_digit : '0'-'9' ;
+_alpha : _letter | _digit ;
+
+/* literals */
+string_literal : '"' {_alpha | ' ' | '!' | '?' | ':' | ',' | '.' }'"' ;
+int : '0' | '1'-'9' {_digit} ;
+
+/* keywords */
+test : 'T' 'E' 'S' 'T' ;
+given : 'G' 'I' 'V' 'E' 'N' ;
+as : 'A' 'S' ;
+object: 'O' 'B' 'J' 'E' 'C' 'T' ;
+call : 'C' 'A' 'L' 'L' ;
+then : 'T' 'H' 'E' 'N' ;
+output : 'O' 'U' 'T' 'P' 'U' 'T' ;
+result : 'R' 'E' 'S' 'U' 'L' 'T' ;
+equals : 'E' 'Q' 'U' 'A' 'L' 'S' ;
+not_equals : 'N' 'O' 'T' ' ' 'E' 'Q' 'U' 'A' 'L' 'S' ;
+contains : 'C' 'O' 'N' 'T' 'A' 'I' 'N' 'S' ;
+
+/* identifiers */
+ident : _letter {_alpha} ;
+
+/* punctuation */
+lbrace : '{' ;
+rbrace : '}' ;
+lparen : '(' ;
+rparen : ')' ;
+comma : ',' ;
+colon : ':' ;
+semicolon : ';' ;
+dot : '.' ;
+
+/* Syntactic Parser */
+
+Configuration
+    : TestDefinitions Statements
+    ;
+
+TestDefinitions
+    : TestDefinitions TestDefinition
+    | empty
+    ;
+
+Statements
+    : Statements Statement
+    | empty
+    ;
+
+Statement
+    : string_literal as ident semicolon
+    ;
+
+TestDefinition
+    : test string_literal GivenBlock CallBlock ThenBlock semicolon
+    ;
+
+GivenBlock
+    : given GivenExpressions
+    | empty
+    ;
+
+GivenExpressions
+    : GivenExpressions comma GivenExpression
+    | GivenExpression
+    ;
+
+GivenExpression
+    : string_literal as ident
+    | int as ident
+    | Object as ident
+    ;
+
+Object
+    : object ident lbrace ObjectProperties rbrace
+    ;
+
+ObjectProperties
+    : ObjectProperties comma ObjectProperty
+    | ObjectProperty
+    | empty
+    ;
+
+ObjectProperty
+    : string_literal colon string_literal
+    | string_literal colon int
+    ;
+
+CallBlock
+    : call ident lparen Arguments rparen
+    ;
+
+Arguments
+    : Arguments comma Argument
+    | Argument
+    | empty
+    ;
+
+Argument
+    : string_literal
+    | int
+    | ident
+    ;
+
+ThenBlock
+    : then output Operation string_literal
+    | then result Operation string_literal
+    | then ident dot ident Operation string_literal
+    | then output Operation ident
+    | then result Operation ident
+    | then ident dot ident Operation ident
+    | then output Operation int
+    | then result Operation int
+    | then ident dot ident Operation int
+    ;
+
+Operation
+    : equals
+    | not_equals
+    | contains
+    ;
