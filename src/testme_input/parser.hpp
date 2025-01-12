@@ -1,8 +1,8 @@
 #pragma once
-#include "class.hpp"
+#include "../testme_meta/class.hpp"
+#include "../testme_meta/method.hpp"
+#include "../testme_meta/variable.hpp"
 #include "lexer.hpp"
-#include "method.hpp"
-#include "variable.hpp"
 #include <memory>
 #include <stdexcept>
 #include <vector>

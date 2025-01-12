@@ -26,5 +26,13 @@ if (googletest_ADDED)
         "${tree-sitter_LIBRARIES};${gtest_LIBRARIES}"
     )
 
+    cxx_test(testme_lexer_test "src/testme_input"
+        "${tree-sitter_LIBRARIES};${gtest_LIBRARIES}"
+    )
+
+    cxx_test(testme_parser_test "src/testme_input"
+        "${tree-sitter_LIBRARIES};${gtest_LIBRARIES}"
+    )
+
     file(COPY ${CMAKE_SOURCE_DIR}/test/data DESTINATION ${CMAKE_BINARY_DIR})
 endif()

@@ -10,7 +10,7 @@ void Class::addVariable(const std::shared_ptr<Variable> &variable) {
   mVariables.push_back(variable);
 }
 
-void Class::deleteVariable(Variable *variable) {
+void Class::deleteVariable(const std::shared_ptr<Variable> &variable) {
   auto it = std::remove(mVariables.begin(), mVariables.end(), variable);
   mVariables.erase(it, mVariables.end());
 }
@@ -21,7 +21,7 @@ void Class::addMethod(const std::shared_ptr<Method> &method) {
   mMethods.push_back(method);
 }
 
-void Class::deleteMethod(Method *method) {
+void Class::deleteMethod(const std::shared_ptr<Method> &method) {
   auto it = std::remove(mMethods.begin(), mMethods.end(), method);
   mMethods.erase(it, mMethods.end());
 }

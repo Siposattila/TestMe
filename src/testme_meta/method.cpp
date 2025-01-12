@@ -11,9 +11,10 @@ void Method::addVariable(const std::shared_ptr<Variable> &variable) {
 }
 
 void Method::deleteVariable(const std::shared_ptr<Variable> &variable) {
-  auto it = std::remove_if(
-      mVariables.begin(), mVariables.end(),
-      [variable](Variable *v) { return v->getName() == variable->getName(); });
+  auto it = std::remove_if(mVariables.begin(), mVariables.end(),
+                           [&variable](const std::shared_ptr<Variable> &v) {
+                             return v->getName() == variable->getName();
+                           });
 
   if (it != mVariables.end()) {
     mVariables.erase(it, mVariables.end());

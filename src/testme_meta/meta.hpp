@@ -4,9 +4,9 @@
 
 class Meta {
 public:
-  Meta(std::string name) : mName(name) {}
+  Meta(std::string name);
 
-  std::string getName() { return mName; }
+  std::string getName();
   void setName(const std::string &name);
 
 protected:

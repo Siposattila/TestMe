@@ -13,11 +13,11 @@ public:
 
   std::vector<std::shared_ptr<Variable>> getVariables();
   void addVariable(const std::shared_ptr<Variable> &variable);
-  void deleteVariable(Variable *variable);
+  void deleteVariable(const std::shared_ptr<Variable> &variable);
 
   std::vector<std::shared_ptr<Method>> getMethods();
   void addMethod(const std::shared_ptr<Method> &method);
-  void deleteMethod(Method *method);
+  void deleteMethod(const std::shared_ptr<Method> &method);
 
 private:
   std::string mName;
