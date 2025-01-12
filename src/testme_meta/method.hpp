@@ -2,6 +2,7 @@
 
 #include "meta.hpp"
 #include "variable.hpp"
+#include <algorithm>
 #include <string>
 #include <vector>
 
