@@ -41,7 +41,7 @@ dot : '.' ;
 /* Syntactic Parser */
 
 Configuration
-    : TestDefinitions Statements
+    : TestDefinitions GlobalDefinitions
     ;
 
 TestDefinitions
@@ -49,13 +49,13 @@ TestDefinitions
     | empty
     ;
 
-Statements
-    : Statements Statement
+GlobalDefinitions
+    : GlobalDefinitions GlobalDefinition
     | empty
     ;
 
-Statement
-    : string_literal as ident semicolon
+GlobalDefinition
+    : Expression semicolon
     ;
 
 TestDefinition
@@ -68,14 +68,8 @@ GivenBlock
     ;
 
 GivenExpressions
-    : GivenExpressions comma GivenExpression
-    | GivenExpression
-    ;
-
-GivenExpression
-    : string_literal as ident
-    | int as ident
-    | Object as ident
+    : GivenExpressions comma Expression
+    | Expression
     ;
 
 Object
@@ -110,15 +104,22 @@ Argument
     ;
 
 ThenBlock
-    : then output Operation string_literal
-    | then result Operation string_literal
-    | then ident dot ident Operation string_literal
-    | then output Operation ident
-    | then result Operation ident
-    | then ident dot ident Operation ident
-    | then output Operation int
-    | then result Operation int
-    | then ident dot ident Operation int
+    : then Expression
+    ;
+
+Expression
+    : string_literal as ident
+    | int as ident
+    | Object as ident
+    | TestOperation Operation string_literal
+    | TestOperation Operation int
+    | TestOperation Operation ident
+    ;
+
+TestOperation
+    : output
+    | result
+    | ident dot ident
     ;
 
 Operation
