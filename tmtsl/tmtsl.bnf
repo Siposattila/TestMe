@@ -40,80 +40,83 @@ dot : '.' ;
 
 /* Syntactic Parser */
 
+<<
+import (
+    "github.com/Siposattila/TestMe/tmtsl/ast"
+)
+>>
+
 Configuration
-    : TestDefinitions GlobalDefinitions
+    : TestDefinitions GlobalDefinitions << ast.NewConfiguration($0, $1) >>
     ;
 
 TestDefinitions
-    : TestDefinitions TestDefinition
-    | empty
+    : TestDefinitions TestDefinition << ast.AppendTestDefinition($0, $1) >>
+    | empty << ast.NewTestDefinitionList() >>
     ;
 
 GlobalDefinitions
-    : GlobalDefinitions GlobalDefinition
-    | empty
+    : GlobalDefinitions GlobalDefinition << ast.AppendGlobalDefinition($0, $1) >>
+    | empty << ast.NewGlobalDefinitionList() >>
     ;
 
 GlobalDefinition
-    : Expression semicolon
+    : Expression semicolon << ast.NewGlobalDefinition($0) >>
     ;
 
 TestDefinition
-    : test string_literal GivenBlock CallBlock ThenBlock semicolon
+    : test string_literal GivenBlock CallBlock ThenBlock semicolon << ast.NewTestDefinition($1, $2, $3, $4) >>
     ;
 
 GivenBlock
-    : given GivenExpressions
+    : given GivenExpressions << ast.NewGivenBlock($1) >>
     | empty
     ;
 
 GivenExpressions
-    : GivenExpressions comma Expression
+    : GivenExpressions comma Expression << ast.AppendGivenExpression($0, $2) >>
     | Expression
+    | empty << ast.NewGivenExpressionList() >>
     ;
 
 Object
-    : object ident lbrace ObjectProperties rbrace
+    : object ident lbrace ObjectProperties rbrace << ast.NewObject($1, $3) >>
     ;
 
 ObjectProperties
-    : ObjectProperties comma ObjectProperty
+    : ObjectProperties comma ObjectProperty << ast.AppendObjectProperty($0, $2) >>
     | ObjectProperty
-    | empty
+    | empty << ast.NewObjectPropertyList() >>
     ;
 
 ObjectProperty
-    : string_literal colon string_literal
-    | string_literal colon int
+    : string_literal colon string_literal << ast.NewObjectProperty($0, $2) >>
+    | string_literal colon int << ast.NewObjectProperty($0, $2) >>
     ;
 
 CallBlock
-    : call ident lparen Arguments rparen
+    : call ident lparen Arguments rparen << ast.NewCallBlock($1, $3) >>
     ;
 
 Arguments
-    : Arguments comma Argument
-    | Argument
-    | empty
-    ;
-
-Argument
-    : string_literal
-    | int
-    | ident
+    : Arguments comma Expression << ast.AppendArgument($0, $2) >>
+    | empty << ast.NewArgumentList() >>
     ;
 
 ThenBlock
-    : then Expression
+    : then Expression << ast.NewThenBlock($1) >>
     ;
 
 Expression
-    : string_literal as ident
-    | int as ident
-    | Object as ident
-    | TestOperation Operation string_literal
-    | TestOperation Operation int
-    | TestOperation Operation ident
+    : string_literal << ast.NewStringLiteral($0) >>
+    | int << ast.NewIntegerLiteral($0) >>
+    | ident << ast.NewIdentifier($0) >>
+    | Expression as ident << ast.NewDefinitionExpression($0, $2) >>
+    | Expression as ident << ast.NewDefinitionExpression($0, $2) >>
+    | Object as ident << ast.NewDefinitionExpression($0, $2) >>
+    | TestOperation Operation string_literal << ast.NewTestOperationExpression($0, $1, $2) >>
+    | TestOperation Operation int << ast.NewTestOperationExpression($0, $1, $2) >>
+    | TestOperation Operation ident << ast.NewTestOperationExpression($0, $1, $2) >>
     ;
 
 TestOperation
