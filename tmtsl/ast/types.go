@@ -26,9 +26,9 @@ type Configuration struct {
 type TestDefinition struct {
 	Token      *token.Token `json:"-"`
 	Name       Expression   `json:"name"`
-	GivenBlock *GivenBlock  `json:"givenBlock,omitempty"`
-	CallBlock  *CallBlock   `json:"callBlock"`
-	ThenBlock  *ThenBlock   `json:"thenBlock"`
+	GivenBlock GivenBlock   `json:"givenBlock,omitempty"`
+	CallBlock  CallBlock    `json:"callBlock"`
+	ThenBlock  ThenBlock    `json:"thenBlock"`
 }
 
 type GlobalDefinition struct {
@@ -87,7 +87,7 @@ type Object struct {
 }
 
 type ObjectProperty struct {
-	Token *token.Token  `json:"-"`
-	Key   StringLiteral `json:"key"`
-	Value Expression    `json:"value"` // Can be StringLiteral or IntegerLiteral.
+	Token *token.Token `json:"-"`
+	Key   string       `json:"key"`
+	Value Expression   `json:"value"` // Can be StringLiteral or IntegerLiteral.
 }

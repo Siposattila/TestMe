@@ -70,13 +70,13 @@ TestDefinition
 
 GivenBlock
     : given GivenExpressions << ast.NewGivenBlock($1) >>
-    | empty
+    | empty << ast.NewGivenBlock(nil) >>
     ;
 
 GivenExpressions
     : GivenExpressions comma Expression << ast.AppendGivenExpression($0, $2) >>
     | Expression << ast.NewGivenExpressionList($0) >>
-    | empty << ast.NewGivenExpressionList($0) >>
+    | empty << ast.NewGivenExpressionList(nil) >>
     ;
 
 Object
@@ -85,13 +85,13 @@ Object
 
 ObjectProperties
     : ObjectProperties comma ObjectProperty << ast.AppendObjectProperty($0, $2) >>
-    | ObjectProperty
-    | empty << ast.NewObjectPropertyList() >>
+    | ObjectProperty << ast.NewObjectPropertyList($0) >>
+    | empty << ast.NewObjectPropertyList(nil) >>
     ;
 
 ObjectProperty
-    : string_literal colon string_literal << ast.NewObjectProperty($0, $2) >>
-    | string_literal colon int << ast.NewObjectProperty($0, $2) >>
+    : string_literal colon string_literal << ast.NewObjectPropertyStringLiteral($0, $2) >>
+    | string_literal colon int << ast.NewObjectPropertyIntegerLiteral($0, $2) >>
     ;
 
 CallBlock
@@ -101,7 +101,7 @@ CallBlock
 Arguments
     : Arguments comma Expression << ast.AppendArgument($0, $2) >>
     | Expression << ast.NewArgumentList($0) >>
-    | empty << ast.NewArgumentList($0) >>
+    | empty << ast.NewArgumentList(nil) >>
     ;
 
 ThenBlock
