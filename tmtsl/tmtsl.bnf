@@ -22,11 +22,8 @@ then : 'T' 'H' 'E' 'N' ;
 output : 'O' 'U' 'T' 'P' 'U' 'T' ;
 result : 'R' 'E' 'S' 'U' 'L' 'T' ;
 equals : 'E' 'Q' 'U' 'A' 'L' 'S' ;
-not_equals : 'N' 'O' 'T' ' ' 'E' 'Q' 'U' 'A' 'L' 'S' ;
+not_equals : 'N' 'O' 'T' 'E' 'Q' 'U' 'A' 'L' 'S' ;
 contains : 'C' 'O' 'N' 'T' 'A' 'I' 'N' 'S' ;
-
-/* identifiers */
-ident : _letter {_alpha} ;
 
 /* punctuation */
 lbrace : '{' ;
@@ -47,21 +44,21 @@ import (
 >>
 
 Configuration
-    : TestDefinitions GlobalDefinitions << ast.NewConfiguration($0, $1) >>
+    : GlobalDefinitions TestDefinitions << ast.NewConfiguration($1, $0) >>
     ;
 
 TestDefinitions
-    : TestDefinitions TestDefinition << ast.AppendTestDefinition($0, $1) >>
-    | empty << ast.NewTestDefinitionList() >>
+    : TestDefinitions TestDefinition << ast.AppendDefinition($0, $1) >>
+    | empty << ast.NewDefinitionList() >>
     ;
 
 GlobalDefinitions
-    : GlobalDefinitions GlobalDefinition << ast.AppendGlobalDefinition($0, $1) >>
-    | empty << ast.NewGlobalDefinitionList() >>
+    : GlobalDefinitions GlobalDefinition << ast.AppendDefinition($0, $1) >>
+    | empty << ast.NewDefinitionList() >>
     ;
 
 GlobalDefinition
-    : Expression semicolon << ast.NewGlobalDefinition($0) >>
+    : DefinitionExpression semicolon << ast.NewGlobalDefinition($0) >>
     ;
 
 TestDefinition
@@ -74,13 +71,13 @@ GivenBlock
     ;
 
 GivenExpressions
-    : GivenExpressions comma Expression << ast.AppendGivenExpression($0, $2) >>
-    | Expression << ast.NewGivenExpressionList($0) >>
+    : GivenExpressions comma DefinitionExpression << ast.AppendGivenExpression($0, $2) >>
+    | DefinitionExpression << ast.NewGivenExpressionList($0) >>
     | empty << ast.NewGivenExpressionList(nil) >>
     ;
 
 Object
-    : object ident lbrace ObjectProperties rbrace << ast.NewObject($1, $3) >>
+    : object string_literal lbrace ObjectProperties rbrace << ast.NewObject($1, $3) >>
     ;
 
 ObjectProperties
@@ -95,34 +92,38 @@ ObjectProperty
     ;
 
 CallBlock
-    : call ident lparen Arguments rparen << ast.NewCallBlock($1, $3) >>
+    : call string_literal lparen Arguments rparen << ast.NewCallBlock($1, $3) >>
     ;
 
 Arguments
-    : Arguments comma Expression << ast.AppendArgument($0, $2) >>
-    | Expression << ast.NewArgumentList($0) >>
+    : Arguments comma Literal << ast.AppendArgument($0, $2) >>
+    | Literal << ast.NewArgumentList($0) >>
     | empty << ast.NewArgumentList(nil) >>
     ;
 
 ThenBlock
-    : then Expression << ast.NewThenBlock($1) >>
+    : then TestOperationExpression << ast.NewThenBlock($1) >>
     ;
 
-Expression
+Literal
     : string_literal << ast.NewStringLiteral($0) >>
     | int << ast.NewIntegerLiteral($0) >>
-    | ident << ast.NewIdentifier($0) >>
-    | Expression as ident << ast.NewDefinitionExpression($0, $2) >>
-    | Object as ident << ast.NewDefinitionExpression($0, $2) >>
-    | TestOperation Operation string_literal << ast.NewTestOperationExpressionStringLiteral($0, $1, $2) >>
+    ;
+
+DefinitionExpression
+    : Literal as Literal << ast.NewDefinitionExpression($0, $2) >>
+    | Object as Literal << ast.NewDefinitionExpression($0, $2) >>
+    ;
+
+TestOperationExpression
+    : TestOperation Operation string_literal << ast.NewTestOperationExpressionStringLiteral($0, $1, $2) >>
     | TestOperation Operation int << ast.NewTestOperationExpressionIntegerLiteral($0, $1, $2) >>
-    | TestOperation Operation ident << ast.NewTestOperationExpressionIdentifier($0, $1, $2) >>
     ;
 
 TestOperation
     : output
     | result
-    | ident dot ident
+    | string_literal dot string_literal
     ;
 
 Operation

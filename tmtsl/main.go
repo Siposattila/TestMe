@@ -4,18 +4,23 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Siposattila/TestMe/tmtsl/ast"
 	"github.com/Siposattila/TestMe/tmtsl/lexer"
 	"github.com/Siposattila/TestMe/tmtsl/parser"
 )
 
-func parse(input string) {
+func parse(input string) *ast.Configuration {
 	l := lexer.NewLexer([]byte(input))
 	p := parser.NewParser()
 
-	_, err := p.Parse(l)
+	root, err := p.Parse(l)
 	if err != nil {
 		panic(err)
 	}
+
+	configuration, _ := root.(*ast.Configuration)
+
+	return configuration
 }
 
 func main() {

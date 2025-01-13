@@ -13,9 +13,9 @@ func TestToken(t *testing.T) {
 		expectedLiteral string
 	}
 	const input = `
-			/* comment should not be scanned */
+			/* comment */
             TEST "Example"
-                CALL Bark()
+                CALL "Bark"()
                 THEN OUTPUT EQUALS "WAU";
 			`
 
@@ -23,7 +23,7 @@ func TestToken(t *testing.T) {
 		{token.TokMap.Type("test"), "TEST"},
 		{token.TokMap.Type("string_literal"), "\"Example\""},
 		{token.TokMap.Type("call"), "CALL"},
-		{token.TokMap.Type("ident"), "Bark"},
+		{token.TokMap.Type("string_literal"), "\"Bark\""},
 		{token.TokMap.Type("lparen"), "("},
 		{token.TokMap.Type("rparen"), ")"},
 		{token.TokMap.Type("then"), "THEN"},
