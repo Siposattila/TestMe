@@ -65,8 +65,8 @@ type DefinitionExpression struct {
 }
 
 type GivenBlock struct {
-	Token       *token.Token `json:"-"`
-	Expressions []Expression `json:"expressions"`
+	Token       *token.Token           `json:"-"`
+	Expressions []DefinitionExpression `json:"expressions"`
 }
 
 type CallBlock struct {

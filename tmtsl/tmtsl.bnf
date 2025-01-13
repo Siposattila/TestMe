@@ -75,8 +75,8 @@ GivenBlock
 
 GivenExpressions
     : GivenExpressions comma Expression << ast.AppendGivenExpression($0, $2) >>
-    | Expression
-    | empty << ast.NewGivenExpressionList() >>
+    | Expression << ast.NewGivenExpressionList($0) >>
+    | empty << ast.NewGivenExpressionList($0) >>
     ;
 
 Object
@@ -100,7 +100,8 @@ CallBlock
 
 Arguments
     : Arguments comma Expression << ast.AppendArgument($0, $2) >>
-    | empty << ast.NewArgumentList() >>
+    | Expression << ast.NewArgumentList($0) >>
+    | empty << ast.NewArgumentList($0) >>
     ;
 
 ThenBlock
@@ -112,11 +113,10 @@ Expression
     | int << ast.NewIntegerLiteral($0) >>
     | ident << ast.NewIdentifier($0) >>
     | Expression as ident << ast.NewDefinitionExpression($0, $2) >>
-    | Expression as ident << ast.NewDefinitionExpression($0, $2) >>
     | Object as ident << ast.NewDefinitionExpression($0, $2) >>
-    | TestOperation Operation string_literal << ast.NewTestOperationExpression($0, $1, $2) >>
-    | TestOperation Operation int << ast.NewTestOperationExpression($0, $1, $2) >>
-    | TestOperation Operation ident << ast.NewTestOperationExpression($0, $1, $2) >>
+    | TestOperation Operation string_literal << ast.NewTestOperationExpressionStringLiteral($0, $1, $2) >>
+    | TestOperation Operation int << ast.NewTestOperationExpressionIntegerLiteral($0, $1, $2) >>
+    | TestOperation Operation ident << ast.NewTestOperationExpressionIdentifier($0, $1, $2) >>
     ;
 
 TestOperation

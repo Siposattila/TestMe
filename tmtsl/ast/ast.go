@@ -2,55 +2,56 @@ package ast
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/Siposattila/TestMe/tmtsl/token"
 )
 
 func astError(function string, expected string, variable string, got interface{}) error {
-	return fmt.Errorf("AST construction error: In function: %s, expected %s for %s. got=%T", function, expected, variable, got)
+	return fmt.Errorf("AST construction error: In function: %s, expected %s for %s. got: %T", function, expected, variable, got)
 }
 
 func (c *Configuration) TokenLiteral() string { return "Configuration" }
 
 func NewConfiguration(testDefinitions, globalDefinitions Attribute) (*Configuration, error) {
-	t, ok := testDefinitions.([]Definition)
+	t, ok := testDefinitions.(*[]Definition)
 	if !ok {
 		return nil, astError("NewConfiguration", "[]Definition", "testDefinitions", testDefinitions)
 	}
 
-	g, ok := globalDefinitions.([]Definition)
+	g, ok := globalDefinitions.(*[]Definition)
 	if !ok {
 		return nil, astError("NewConfiguration", "[]Definition", "globalDefinitions", globalDefinitions)
 	}
 
-	return &Configuration{TestDefinitions: t, GlobalDefinitions: g}, nil
+	return &Configuration{TestDefinitions: *t, GlobalDefinitions: *g}, nil
 }
 
 func (td *TestDefinition) definitionNode()      {}
 func (td *TestDefinition) TokenLiteral() string { return "TestDefinition" }
 
 func NewTestDefinition(name, givenBlock, callBlock, thenBlock Attribute) (*TestDefinition, error) {
-	n, ok := name.(Expression)
+	n, ok := name.(*token.Token)
 	if !ok {
-		return nil, astError("NewTestDefinition", "StringLiteral", "name", name)
+		return nil, astError("NewTestDefinition", "*token.Token", "name", name)
 	}
 
-	g, ok := givenBlock.(GivenBlock)
+	g, ok := givenBlock.(*GivenBlock)
 	if !ok {
-		return nil, astError("NewTestDefinition", "GivenBlock", "givenBlock", givenBlock)
+		return nil, astError("NewTestDefinition", "*GivenBlock", "givenBlock", givenBlock)
 	}
 
-	c, ok := callBlock.(CallBlock)
+	c, ok := callBlock.(*CallBlock)
 	if !ok {
-		return nil, astError("NewTestDefinition", "CallBlock", "callBlock", callBlock)
+		return nil, astError("NewTestDefinition", "*CallBlock", "callBlock", callBlock)
 	}
 
-	t, ok := thenBlock.(ThenBlock)
+	t, ok := thenBlock.(*ThenBlock)
 	if !ok {
-		return nil, astError("NewTestDefinition", "ThenBlock", "thenBlock", thenBlock)
+		return nil, astError("NewTestDefinition", "*ThenBlock", "thenBlock", thenBlock)
 	}
 
-	return &TestDefinition{Name: n, GivenBlock: &g, CallBlock: &c, ThenBlock: &t}, nil
+	return &TestDefinition{Name: &StringLiteral{Value: n.StringValue()}, GivenBlock: g, CallBlock: c, ThenBlock: t}, nil
 }
 
 func NewTestDefinitionList() (*[]Definition, error) {
@@ -58,19 +59,19 @@ func NewTestDefinitionList() (*[]Definition, error) {
 }
 
 func AppendTestDefinition(testDefinitions, testDefinition Attribute) (*[]Definition, error) {
-	ts, ok := testDefinitions.([]Definition)
+	ts, ok := testDefinitions.(*[]Definition)
 	if !ok {
-		return nil, astError("AppendTestDefinition", "[]Definition", "testDefinitions", testDefinitions)
+		return nil, astError("AppendTestDefinition", "*[]Definition", "testDefinitions", testDefinitions)
 	}
 
-	t, ok := testDefinition.(TestDefinition)
+	t, ok := testDefinition.(*TestDefinition)
 	if !ok {
-		return nil, astError("AppendTestDefinition", "TestDefinition", "testDefinition", testDefinition)
+		return nil, astError("AppendTestDefinition", "*TestDefinition", "testDefinition", testDefinition)
 	}
 
-	ts = append(ts, &t)
+	*ts = append(*ts, t)
 
-	return &ts, nil
+	return ts, nil
 }
 
 func (gd *GlobalDefinition) definitionNode()      {}
@@ -109,53 +110,75 @@ func (gb *GivenBlock) expressionNode()      {}
 func (gb *GivenBlock) TokenLiteral() string { return gb.Token.StringValue() }
 
 func NewGivenBlock(givenExpressions Attribute) (*GivenBlock, error) {
-	ge, ok := givenExpressions.([]Expression)
+	gs, ok := givenExpressions.(*[]DefinitionExpression)
 	if !ok {
-		return nil, astError("NewGivenBlock", "[]Expression", "givenExpressions", givenExpressions)
+		return nil, astError("NewGivenBlock", "[]DefinitionExpression", "givenExpressions", givenExpressions)
 	}
 
-	return &GivenBlock{Expressions: ge}, nil
+	return &GivenBlock{Expressions: *gs}, nil
 }
 
-func NewGivenExpressionList() (*[]Expression, error) {
-	return &[]Expression{}, nil
+func NewGivenExpressionList(attr Attribute) (*[]DefinitionExpression, error) {
+	list := &[]DefinitionExpression{}
+	_, ok := attr.(*token.Token)
+	if !ok {
+		t, ok := attr.(*DefinitionExpression)
+		if !ok {
+			return nil, astError("NewGivenExpressionList", "*DefinitionExpression", "attr", attr)
+		}
+
+		*list = append(*list, *t)
+	}
+
+	return list, nil
 }
 
-func AppendGivenExpression(givenExpressions, givenExpression Attribute) (*[]Expression, error) {
-	gs, ok := givenExpressions.([]Expression)
+func AppendGivenExpression(givenExpressions, givenExpression Attribute) (*[]DefinitionExpression, error) {
+	gs, ok := givenExpressions.(*[]DefinitionExpression)
 	if !ok {
-		return nil, astError("AppendGivenExpression", "[]Expression", "givenExpressions", givenExpressions)
+		return nil, astError("AppendGivenExpression", "[]DefinitionExpression", "givenExpressions", givenExpressions)
 	}
 
-	ge, ok := givenExpression.(Expression)
+	ge, ok := givenExpression.(*DefinitionExpression)
 	if !ok {
-		return nil, astError("AppendGivenExpression", "Expression", "givenExpression", givenExpression)
+		return nil, astError("AppendGivenExpression", "DefinitionExpression", "givenExpression", givenExpression)
 	}
 
-	gs = append(gs, ge)
+	*gs = append(*gs, *ge)
 
-	return &gs, nil
+	return gs, nil
 }
 
 func (cb *CallBlock) expressionNode()      {}
 func (cb *CallBlock) TokenLiteral() string { return cb.Token.StringValue() }
 
 func NewCallBlock(function, arguments Attribute) (*CallBlock, error) {
-	f, ok := function.(Identifier)
+	f, ok := function.(*token.Token)
 	if !ok {
 		return nil, astError("NewCallBlock", "Identifier", "function", function)
 	}
 
-	as, ok := arguments.([]Expression)
+	as, ok := arguments.(*[]Expression)
 	if !ok {
 		return nil, astError("NewCallBlock", "[]Expression", "arguments", arguments)
 	}
 
-	return &CallBlock{Function: f, Arguments: as}, nil
+	return &CallBlock{Function: Identifier{Value: f.StringValue()}, Arguments: *as}, nil
 }
 
-func NewArgumentList() (*[]Expression, error) {
-	return &[]Expression{}, nil
+func NewArgumentList(attr Attribute) (*[]Expression, error) {
+	list := &[]Expression{}
+	_, ok := attr.(*token.Token)
+	if !ok {
+		t, ok := attr.(*Expression)
+		if !ok {
+			return nil, astError("NewArgumentList", "*Expression", "attr", attr)
+		}
+
+		*list = append(*list, *t)
+	}
+
+	return list, nil
 }
 
 func AppendArgument(arguments, argument Attribute) (*[]Expression, error) {
@@ -190,24 +213,29 @@ func (i *Identifier) expressionNode()      {}
 func (i *Identifier) TokenLiteral() string { return i.Token.StringValue() }
 
 func NewIdentifier(value Attribute) (*Identifier, error) {
-	v, ok := value.(string)
+	v, ok := value.(*token.Token)
 	if !ok {
 		return nil, astError("NewIdentifier", "string", "value", value)
 	}
 
-	return &Identifier{Value: v}, nil
+	return &Identifier{Value: v.StringValue()}, nil
 }
 
 func (il *IntegerLiteral) expressionNode()      {}
 func (il *IntegerLiteral) TokenLiteral() string { return il.Token.StringValue() }
 
 func NewIntegerLiteral(value Attribute) (*IntegerLiteral, error) {
-	v, ok := value.(int)
+	v, ok := value.(*token.Token)
 	if !ok {
+		return nil, astError("NewIntegerLiteral", "*token.Token", "value", value)
+	}
+
+	i, err := strconv.Atoi(string(v.Lit))
+	if err != nil {
 		return nil, astError("NewIntegerLiteral", "int", "value", value)
 	}
 
-	return &IntegerLiteral{Value: v}, nil
+	return &IntegerLiteral{Value: i}, nil
 }
 
 func (sl *StringLiteral) expressionNode()      {}
@@ -225,23 +253,71 @@ func NewStringLiteral(value Attribute) (*StringLiteral, error) {
 func (toe *TestOperationExpression) expressionNode()      {}
 func (toe *TestOperationExpression) TokenLiteral() string { return toe.Token.StringValue() }
 
-func NewTestOperationExpression(testOperation, operation, value Attribute) (*TestOperationExpression, error) {
-	t, ok := testOperation.(string)
+func NewTestOperationExpressionStringLiteral(testOperation, operation, value Attribute) (*TestOperationExpression, error) {
+	t, ok := testOperation.(*token.Token)
 	if !ok {
-		return nil, astError("NewTestOperationExpression", "string", "testOperation", testOperation)
+		return nil, astError("NewTestOperationExpressionStringLiteral", "string", "testOperation", testOperation)
 	}
 
-	o, ok := operation.(string)
+	o, ok := operation.(*token.Token)
 	if !ok {
-		return nil, astError("NewTestOperationExpression", "string", "operation", operation)
+		return nil, astError("NewTestOperationExpressionStringLiteral", "string", "operation", operation)
 	}
 
-	v, ok := value.(Expression)
+	v, ok := value.(*token.Token)
 	if !ok {
-		return nil, astError("NewTestOperationExpression", "Expression", "value", value)
+		return nil, astError("NewTestOperationExpressionStringLiteral", "*token.Token", "value", value)
 	}
 
-	return &TestOperationExpression{TestOperation: t, Operation: o, Value: v}, nil
+	return &TestOperationExpression{TestOperation: t.StringValue(), Operation: o.StringValue(), Value: &StringLiteral{Value: v.StringValue()}}, nil
+}
+
+func NewTestOperationExpressionIntegerLiteral(testOperation, operation, value Attribute) (*TestOperationExpression, error) {
+	t, ok := testOperation.(*token.Token)
+	if !ok {
+		return nil, astError("NewTestOperationExpressionIntegerLiteral", "string", "testOperation", testOperation)
+	}
+
+	o, ok := operation.(*token.Token)
+	if !ok {
+		return nil, astError("NewTestOperationExpressionIntegerLiteral", "string", "operation", operation)
+	}
+
+	v, ok := value.(*token.Token)
+	if !ok {
+		return nil, astError("NewTestOperationExpressionIntegerLiteral", "*token.Token", "value", value)
+	}
+
+	i, err := NewIntegerLiteral(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TestOperationExpression{TestOperation: t.StringValue(), Operation: o.StringValue(), Value: i}, nil
+}
+
+func NewTestOperationExpressionIdentifier(testOperation, operation, value Attribute) (*TestOperationExpression, error) {
+	t, ok := testOperation.(*token.Token)
+	if !ok {
+		return nil, astError("NewTestOperationExpressionIdentifier", "string", "testOperation", testOperation)
+	}
+
+	o, ok := operation.(*token.Token)
+	if !ok {
+		return nil, astError("NewTestOperationExpressionIdentifier", "string", "operation", operation)
+	}
+
+	v, ok := value.(*token.Token)
+	if !ok {
+		return nil, astError("NewTestOperationExpressionIdentifier", "*token.Token", "value", value)
+	}
+
+	i, err := NewIdentifier(v)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TestOperationExpression{TestOperation: t.StringValue(), Operation: o.StringValue(), Value: i}, nil
 }
 
 func (de *DefinitionExpression) expressionNode()      {}
@@ -253,12 +329,12 @@ func NewDefinitionExpression(value, id Attribute) (*DefinitionExpression, error)
 		return nil, astError("NewDefinitionExpression", "Expression", "value", value)
 	}
 
-	i, ok := id.(Identifier)
+	i, ok := id.(*token.Token)
 	if !ok {
 		return nil, astError("NewDefinitionExpression", "Identifier", "id", id)
 	}
 
-	return &DefinitionExpression{Value: v, Id: i}, nil
+	return &DefinitionExpression{Value: v, Id: Identifier{Value: i.StringValue()}}, nil
 }
 
 func (o *Object) expressionNode()      {}
@@ -297,17 +373,17 @@ func NewObjectPropertyList() (*[]ObjectProperty, error) {
 }
 
 func AppendObjectProperty(objectProperties, objectProperty Attribute) (*[]ObjectProperty, error) {
-	os, ok := objectProperties.([]ObjectProperty)
+	os, ok := objectProperties.(*[]ObjectProperty)
 	if !ok {
 		return nil, astError("AppendObjectProperty", "[]ObjectProperty", "objectProperties", objectProperties)
 	}
 
-	o, ok := objectProperty.(ObjectProperty)
+	o, ok := objectProperty.(*ObjectProperty)
 	if !ok {
 		return nil, astError("AppendObjectProperty", "ObjectProperty", "objectProperty", objectProperty)
 	}
 
-	os = append(os, o)
+	*os = append(*os, *o)
 
-	return &os, nil
+	return os, nil
 }
