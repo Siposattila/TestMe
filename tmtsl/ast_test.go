@@ -23,16 +23,16 @@ func TestAST(t *testing.T) {
 		GlobalDefinitions: []ast.Definition{
 			ast.GlobalDefinition{
 				Expression: ast.DefinitionExpression{
-					Value: ast.StringLiteral{Value: "class Dog"},
-					Name:  ast.StringLiteral{Value: "Dog"},
+					Value: ast.StringLiteral{Value: "\"class Dog\""},
+					Name:  ast.StringLiteral{Value: "\"Dog\""},
 				},
 			},
 		},
 		TestDefinitions: []ast.Definition{
 			ast.TestDefinition{
-				Name:       "Example",
+				Name:       ast.StringLiteral{Value: "\"Example\""},
 				GivenBlock: ast.GivenBlock{},
-				CallBlock:  ast.CallBlock{Function: "Bark", Arguments: []ast.Expression{}},
+				CallBlock:  ast.CallBlock{Function: ast.StringLiteral{Value: "\"Bark\""}, Arguments: []ast.Expression{}},
 				ThenBlock: ast.ThenBlock{
 					Expression: ast.TestOperationExpression{
 						TestOperation: "OUTPUT",

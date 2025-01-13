@@ -14,12 +14,12 @@ func (de DefinitionExpression) TokenLiteral() string { return de.Token.StringVal
 func NewDefinitionExpression(value, name Attribute) (DefinitionExpression, error) {
 	v, ok := value.(Expression)
 	if !ok {
-		return DefinitionExpression{}, astError("NewDefinitionExpression", "StringLiteral", "value", value)
+		return DefinitionExpression{}, astError("NewDefinitionExpression", "Expression", "value", value)
 	}
 
 	n, ok := name.(StringLiteral)
 	if !ok {
-		return DefinitionExpression{}, astError("NewDefinitionExpression", "*token.Token", "name", name)
+		return DefinitionExpression{}, astError("NewDefinitionExpression", "StringLiteral", "name", name)
 	}
 
 	return DefinitionExpression{Token: n.Token, Value: v, Name: n}, nil

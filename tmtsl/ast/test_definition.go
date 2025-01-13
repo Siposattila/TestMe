@@ -1,21 +1,19 @@
 package ast
 
-import "github.com/Siposattila/TestMe/tmtsl/token"
-
 type TestDefinition struct {
-	Name       string     `json:"name"`
-	GivenBlock GivenBlock `json:"givenBlock,omitempty"`
-	CallBlock  CallBlock  `json:"callBlock"`
-	ThenBlock  ThenBlock  `json:"thenBlock"`
+	Name       StringLiteral `json:"name"`
+	GivenBlock GivenBlock    `json:"givenBlock,omitempty"`
+	CallBlock  CallBlock     `json:"callBlock"`
+	ThenBlock  ThenBlock     `json:"thenBlock"`
 }
 
 func (td TestDefinition) definitionNode()      {}
 func (td TestDefinition) TokenLiteral() string { return "TestDefinition" }
 
 func NewTestDefinition(name, givenBlock, callBlock, thenBlock Attribute) (TestDefinition, error) {
-	n, ok := name.(*token.Token)
+	n, ok := name.(StringLiteral)
 	if !ok {
-		return TestDefinition{}, astError("NewTestDefinition", "*token.Token", "name", name)
+		return TestDefinition{}, astError("NewTestDefinition", "StringLiteral", "name", name)
 	}
 
 	g, ok := givenBlock.(GivenBlock)
@@ -33,5 +31,5 @@ func NewTestDefinition(name, givenBlock, callBlock, thenBlock Attribute) (TestDe
 		return TestDefinition{}, astError("NewTestDefinition", "ThenBlock", "thenBlock", thenBlock)
 	}
 
-	return TestDefinition{Name: n.StringValue(), GivenBlock: g, CallBlock: c, ThenBlock: t}, nil
+	return TestDefinition{Name: n, GivenBlock: g, CallBlock: c, ThenBlock: t}, nil
 }

@@ -4,23 +4,23 @@ import "github.com/Siposattila/TestMe/tmtsl/token"
 
 type Object struct {
 	Token      *token.Token     `json:"-"`
-	Name       string           `json:"name"`
+	Name       StringLiteral    `json:"name"`
 	Properties []ObjectProperty `json:"properties,omitempty"`
 }
 
 type ObjectProperty struct {
-	Token *token.Token `json:"-"`
-	Key   string       `json:"key"`
-	Value Expression   `json:"value"`
+	Token *token.Token  `json:"-"`
+	Key   StringLiteral `json:"key"`
+	Value Expression    `json:"value"`
 }
 
 func (o Object) expressionNode()      {}
 func (o Object) TokenLiteral() string { return string(o.Token.Lit) }
 
 func NewObject(name, properties Attribute) (Object, error) {
-	n, ok := name.(*token.Token)
+	n, ok := name.(StringLiteral)
 	if !ok {
-		return Object{}, astError("NewObject", "*token.Token", "name", name)
+		return Object{}, astError("NewObject", "StringLiteral", "name", name)
 	}
 
 	p, ok := properties.([]ObjectProperty)
@@ -28,45 +28,21 @@ func NewObject(name, properties Attribute) (Object, error) {
 		return Object{}, astError("NewObject", "[]ObjectProperty", "properties", properties)
 	}
 
-	return Object{Token: n, Name: string(n.Lit), Properties: p}, nil
+	return Object{Token: n.Token, Name: n, Properties: p}, nil
 }
 
-func NewObjectPropertyStringLiteral(key, value Attribute) (ObjectProperty, error) {
-	k, ok := key.(*token.Token)
+func NewObjectProperty(key, value Attribute) (ObjectProperty, error) {
+	k, ok := key.(StringLiteral)
 	if !ok {
-		return ObjectProperty{}, astError("NewObjectPropertyStringLiteral", "*token.Token", "key", key)
+		return ObjectProperty{}, astError("NewObjectProperty", "StringLiteral", "key", key)
 	}
 
-	v, ok := value.(*token.Token)
+	v, ok := value.(Expression)
 	if !ok {
-		return ObjectProperty{}, astError("NewObjectPropertyStringLiteral", "Expression", "value", value)
+		return ObjectProperty{}, astError("NewObjectProperty", "Expression", "value", value)
 	}
 
-	sl, err := NewStringLiteral(v)
-	if err != nil {
-		return ObjectProperty{}, err
-	}
-
-	return ObjectProperty{Token: k, Key: string(k.Lit), Value: sl}, nil
-}
-
-func NewObjectPropertyIntegerLiteral(key, value Attribute) (ObjectProperty, error) {
-	k, ok := key.(*token.Token)
-	if !ok {
-		return ObjectProperty{}, astError("NewObjectPropertyIntegerLiteral", "*token.Token", "key", key)
-	}
-
-	v, ok := value.(*token.Token)
-	if !ok {
-		return ObjectProperty{}, astError("NewObjectPropertyIntegerLiteral", "*token.Token", "value", value)
-	}
-
-	il, err := NewIntegerLiteral(v)
-	if err != nil {
-		return ObjectProperty{}, err
-	}
-
-	return ObjectProperty{Token: k, Key: string(k.Lit), Value: il}, nil
+	return ObjectProperty{Token: k.Token, Key: k, Value: v}, nil
 }
 
 func NewObjectPropertyList(expression Attribute) ([]ObjectProperty, error) {

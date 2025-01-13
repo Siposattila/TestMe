@@ -3,18 +3,18 @@ package ast
 import "github.com/Siposattila/TestMe/tmtsl/token"
 
 type CallBlock struct {
-	Token     *token.Token `json:"-"`
-	Function  string       `json:"function"`
-	Arguments []Expression `json:"arguments"`
+	Token     *token.Token  `json:"-"`
+	Function  StringLiteral `json:"function"`
+	Arguments []Expression  `json:"arguments"`
 }
 
 func (cb CallBlock) expressionNode()      {}
 func (cb CallBlock) TokenLiteral() string { return string(cb.Token.Lit) }
 
 func NewCallBlock(function, arguments Attribute) (CallBlock, error) {
-	f, ok := function.(*token.Token)
+	f, ok := function.(StringLiteral)
 	if !ok {
-		return CallBlock{}, astError("NewCallBlock", "*token.Token", "function", function)
+		return CallBlock{}, astError("NewCallBlock", "StringLiteral", "function", function)
 	}
 
 	as, ok := arguments.([]Expression)
@@ -22,7 +22,7 @@ func NewCallBlock(function, arguments Attribute) (CallBlock, error) {
 		return CallBlock{}, astError("NewCallBlock", "[]Expression", "arguments", arguments)
 	}
 
-	return CallBlock{Token: f, Function: string(f.Lit), Arguments: as}, nil
+	return CallBlock{Token: f.Token, Function: f, Arguments: as}, nil
 }
 
 func NewArgumentList(expression Attribute) ([]Expression, error) {
