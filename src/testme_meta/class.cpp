@@ -1,4 +1,5 @@
 #include "class.hpp"
+#include <algorithm>
 
 Class::Class(const std::string &name) : Meta(name) {}
 
@@ -11,8 +12,7 @@ void Class::addVariable(const std::shared_ptr<Variable> &variable) {
 }
 
 void Class::deleteVariable(const std::shared_ptr<Variable> &variable) {
-  auto it = std::remove(mVariables.begin(), mVariables.end(), variable);
-  mVariables.erase(it, mVariables.end());
+  mVariables.erase(std::find(mVariables.begin(), mVariables.end(), variable));
 }
 
 std::vector<std::shared_ptr<Method>> Class::getMethods() { return mMethods; }
@@ -22,6 +22,5 @@ void Class::addMethod(const std::shared_ptr<Method> &method) {
 }
 
 void Class::deleteMethod(const std::shared_ptr<Method> &method) {
-  auto it = std::remove(mMethods.begin(), mMethods.end(), method);
-  mMethods.erase(it, mMethods.end());
+  mMethods.erase(std::find(mMethods.begin(), mMethods.end(), method));
 }

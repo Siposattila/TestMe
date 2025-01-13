@@ -5,10 +5,16 @@ CPMAddPackage(
   OPTIONS "INSTALL_GTEST OFF" "gtest_force_shared_crt ON"
 )
 
-function(cxx_test NAME SRC LIBS)
+function(cxx_test NAME SOURCES LIBS)
     add_executable(${NAME} "test/${NAME}.cpp")
-    file(GLOB ${NAME}_SOURCES "${SRC}/*.cpp")
-    target_sources(${NAME} PRIVATE ${${NAME}_SOURCES})
+
+    set(TEST_SOURCES)
+    foreach(SRC ${SOURCES})
+        file(GLOB ${NAME}_SOURCES_FROM_${SRC} "${SRC}/*.cpp")
+        list(APPEND TEST_SOURCES ${${NAME}_SOURCES_FROM_${SRC}})
+    endforeach()
+    target_sources(${NAME} PRIVATE ${TEST_SOURCES})
+
     target_link_libraries(${NAME} PRIVATE ${LIBS})
     target_compile_features(${NAME} PRIVATE cxx_std_20)
     add_test(${NAME} ${NAME})
@@ -26,12 +32,12 @@ if (googletest_ADDED)
         "${tree-sitter_LIBRARIES};${gtest_LIBRARIES}"
     )
 
-    cxx_test(testme_lexer_test "src/testme_input"
-        "${tree-sitter_LIBRARIES};${gtest_LIBRARIES}"
+    cxx_test(testme_lexer_test "src/testme_lexer"
+        ${gtest_LIBRARIES}
     )
 
-    cxx_test(testme_parser_test "src/testme_input"
-        "${tree-sitter_LIBRARIES};${gtest_LIBRARIES}"
+    cxx_test(testme_parser_test "src/testme_parser;src/testme_lexer;src/testme_meta"
+        ${gtest_LIBRARIES}
     )
 
     file(COPY ${CMAKE_SOURCE_DIR}/test/data DESTINATION ${CMAKE_BINARY_DIR})

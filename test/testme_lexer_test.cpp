@@ -1,6 +1,5 @@
-#include "lexer.hpp"
 #include <gtest/gtest.h>
-#include <sstream>
+#include <testme_lexer/lexer.hpp>
 
 TEST(LexerTest, TestKeywordsAndIdentifiers) {
   std::string code = "class MyClass { void myMethod() { int x; } }";
@@ -56,6 +55,10 @@ TEST(LexerTest, TestKeywordsAndIdentifiers) {
   ASSERT_EQ(token.type, TokenType::IDENTIFIER);
   ASSERT_EQ(token.value, "x");
 
+  token = lexer.nextToken();
+  ASSERT_EQ(token.type, TokenType::SYMBOL);
+  ASSERT_EQ(token.value, ";");
+
   // Test for closing brace
   token = lexer.nextToken();
   ASSERT_EQ(token.type, TokenType::SYMBOL);
@@ -69,4 +72,10 @@ TEST(LexerTest, TestEmptyString) {
 
   Token token = lexer.nextToken();
   ASSERT_EQ(token.type, TokenType::END_OF_FILE);
+}
+
+int main() {
+  testing::InitGoogleTest();
+
+  return RUN_ALL_TESTS();
 }

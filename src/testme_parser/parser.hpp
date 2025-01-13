@@ -1,15 +1,14 @@
 #pragma once
-#include "../testme_meta/class.hpp"
-#include "../testme_meta/method.hpp"
-#include "../testme_meta/variable.hpp"
-#include "lexer.hpp"
+
 #include <memory>
-#include <stdexcept>
-#include <vector>
+#include <testme_lexer/lexer.hpp>
+#include <testme_meta/class.hpp>
+#include <testme_meta/method.hpp>
+#include <testme_meta/variable.hpp>
 
 class Parser {
 public:
-  explicit Parser(Lexer &lexer);
+  Parser(Lexer &lexer);
 
   std::shared_ptr<Class> parseClass();
 

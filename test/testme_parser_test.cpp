@@ -1,11 +1,11 @@
-#include "class.hpp"
-#include "lexer.hpp"
-#include "parser.hpp"
 #include <gtest/gtest.h>
+#include <testme_lexer/lexer.hpp>
+#include <testme_meta/class.hpp>
+#include <testme_parser/parser.hpp>
 
-// Test parsing a simple class
-TEST(ParserTest, TestParseClassWithMethod) {
-  std::string code = "class MyClass { void myMethod() { int x; } }";
+TEST(ParserTest, TestParseClassWithMethodWithParameters) {
+  std::string code =
+      "class MyClass { void myMethod(int a, string b) { int x; } }";
   Lexer lexer(code);
   Parser parser(lexer);
 
@@ -17,11 +17,13 @@ TEST(ParserTest, TestParseClassWithMethod) {
 
   // Check method
   ASSERT_EQ(clazz->getMethods().size(), 1);
-  ASSERT_EQ(clazz->getMethods()[0]->getName(), "myMethod");
+  auto method = clazz->getMethods()[0];
+  ASSERT_EQ(method->getName(), "myMethod");
 
-  // Check variables
-  ASSERT_EQ(clazz->getVariables().size(), 1);
-  ASSERT_EQ(clazz->getVariables()[0]->getName(), "x");
+  // Check method parameters
+  ASSERT_EQ(method->getVariables().size(), 2);
+  ASSERT_EQ(method->getVariables()[0]->getName(), "a");
+  ASSERT_EQ(method->getVariables()[1]->getName(), "b");
 }
 
 // Test parsing a class without any methods or variables
@@ -81,4 +83,9 @@ TEST(ParserTest, TestParseClassWithMultipleMethods) {
 
   // Ensure no variables
   ASSERT_EQ(clazz->getVariables().size(), 0);
+}
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }

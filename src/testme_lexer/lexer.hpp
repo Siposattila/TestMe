@@ -1,18 +1,18 @@
 #pragma once
+
 #include <cctype>
 #include <functional>
 #include <string>
-#include <vector>
 
 enum class TokenType {
-  KEYWORD,
-  IDENTIFIER,
-  OPERATOR,
-  NUMBER,
-  TYPE,
-  SYMBOL,
-  STRING,
-  END_OF_FILE
+  KEYWORD = 0,
+  IDENTIFIER = 1,
+  OPERATOR = 2,
+  NUMBER = 3,
+  TYPE = 4,
+  SYMBOL = 5,
+  STRING = 6,
+  END_OF_FILE = 7
 };
 
 struct Token {
@@ -33,4 +33,6 @@ private:
   std::string readWhile(std::function<bool(char)> condition);
   std::string readUntil(char stopChar);
   bool valueIsType(const std::string &value);
+
+  void skipWhitespace();
 };
