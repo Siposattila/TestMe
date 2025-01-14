@@ -17,6 +17,9 @@ type ObjectProperty struct {
 func (o Object) expressionNode()      {}
 func (o Object) TokenLiteral() string { return string(o.Token.Lit) }
 
+func (oy ObjectProperty) expressionNode()      {}
+func (oy ObjectProperty) TokenLiteral() string { return string(oy.Token.Lit) }
+
 func NewObject(name, properties Attribute) (Object, error) {
 	n, ok := name.(StringLiteral)
 	if !ok {

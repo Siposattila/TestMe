@@ -1,0 +1,8 @@
+TEST "Example"
+    GIVEN 12 AS "number"
+    CALL "Method"(12)
+    THEN RESULT EQUALS 12;
+
+TEST "Example2"
+    CALL "Method"("XYXY")
+    THEN RESULT EQUALS "XYXYXY";
